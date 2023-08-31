@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <marten/bio.h>
+#include <marten/bio-cache.h>
 
 static struct bio *bio_alloc (int dev, off_t offset, size_t count, int mode)
 {
@@ -24,7 +24,7 @@ static struct bio *bio_alloc (int dev, off_t offset, size_t count, int mode)
 	rwlock_init (&o->bio_lock);
 	memset (&o->bio_cb, 0, sizeof (o->bio_cb));
 
-	o->bio_ref    = 1;
+	o->bio_ref    = 2;	/* one for retval, plus one for cache	*/
 	o->bio_state  = 0;
 	o->bio_dev    = dev;
 	o->bio_count  = count;
@@ -33,6 +33,7 @@ static struct bio *bio_alloc (int dev, off_t offset, size_t count, int mode)
 	if ((mode & BIO_R) != 0 && !bio_load_emit (o))
 		goto no_read;
 
+	bio_cache_push (o);
 	return o;
 no_read:
 no_data:
@@ -49,7 +50,9 @@ static void bio_free (struct bio *o)
 
 struct bio *bio_get (int dev, off_t offset, size_t count, int mode)
 {
-	return bio_alloc (dev, offset, count, mode);
+	struct bio *o = bio_cache_lookup (dev, offset, count);
+
+	return o != NULL ? o : bio_alloc (dev, offset, count, mode);
 }
 
 void bio_put (struct bio *o)
