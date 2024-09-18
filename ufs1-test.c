@@ -23,11 +23,10 @@
 #define ARRAY_SIZE(a)	(sizeof (a) / sizeof ((a)[0]))
 #endif
 
-static
-void ufs1_inode_show_db (const struct ufs_sb *s, const struct ufs1_inode *o)
+static void ufs1_inode_show_db (const struct ufs1_inode *o, int bshift)
 {
 	const int count = MIN (ARRAY_SIZE (o->i_db),
-			       howmany (o->i_size, 1 << s->s_bshift));
+			       howmany (o->i_size, 1 << bshift));
 	int i;
 
 	if (o->i_size == 0)
@@ -58,7 +57,7 @@ static int ufs1_cg_inode_show (const struct ufs_cg *c, int n)
 	fprintf (stderr, "I:     %2d: %06o %3d %4u %4u %8llu, %3u sectors",
 		 ufs_cg_ino (c, n), o->i_mode, o->i_nlink, o->i_uid, o->i_gid,
 		 (unsigned long long) o->i_size, o->i_blocks);
-	ufs1_inode_show_db (c->sb, o);
+	ufs1_inode_show_db (o, c->sb->s_bshift);
 	fputc ('\n', stderr);
 	return 1;
 }
