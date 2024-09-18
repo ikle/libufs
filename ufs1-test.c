@@ -112,6 +112,8 @@ static inline int32_t ufs_cg_dblkno (const struct ufs_sb *o, uint32_t cgx)
 }
 
 struct ufs_cg {
+	const struct ufs_sb *sb;
+
 	void		*cg_data;
 	int32_t		cg_start;
 	uint32_t	cg_cgx, cg_ipg, cg_fpg;
@@ -143,7 +145,7 @@ static int ufs_cg_error (struct ufs_cg *o, const char *reason)
 static int ufs_cg_init (struct ufs_cg *o, const struct ufs_sb *s, uint32_t cgx)
 {
 	struct ufs1_cg *c;
-	off_t pos = (off_t) ufs_cg_cblkno (s, cgx) << s->s_fshift;
+	off_t pos = (off_t) ufs_cg_cblkno (o->sb = s, cgx) << s->s_fshift;
 
 	if ((c = o->cg_data = malloc (s->s_cgsize)) == NULL)
 		return 0;
@@ -198,9 +200,9 @@ void ufs1_inode_show_db (const struct ufs_sb *s, const struct ufs1_inode *o)
 		fprintf (stderr, ", %d", o->i_db[i]);
 }
 
-static
-int ufs1_inode_show (const struct ufs_sb *s, const struct ufs_cg *c, int n)
+static int ufs1_inode_show (const struct ufs_cg *c, int n)
 {
+	const struct ufs_sb *s = c->sb;
 	struct ufs1_inode buf, *o = &buf;
 	off_t pos = ((off_t) ufs_cg_iblkno (s, c->cg_cgx) << s->s_fshift) +
 		    n * sizeof (*o);
@@ -220,14 +222,14 @@ int ufs1_inode_show (const struct ufs_sb *s, const struct ufs_cg *c, int n)
 	return 1;
 }
 
-static int ufs_cg_show_inodes (const struct ufs_sb *s, const struct ufs_cg *c)
+static int ufs_cg_show_inodes (const struct ufs_cg *c)
 {
 	uint32_t i;
 
 	fprintf (stderr, "I: List of i-nodes:\n");
 
 	for (i = 0; i < c->cg_ipg; ++i)
-		if (!ufs1_inode_show (s, c, i))
+		if (!ufs1_inode_show (c, i))
 			return 0;
 
 	return 1;
@@ -277,7 +279,7 @@ int main (int argc, char *argv[])
 
 		fprintf (stderr, "I: Valid UFS1 cylinder group %u found\n", i);
 		show_stat (&c.cg_stat);
-		ufs_cg_show_inodes (&s, &c);
+		ufs_cg_show_inodes (&c);
 		ufs_cg_fini (&c);
 	}
 
