@@ -23,6 +23,18 @@
 #define ARRAY_SIZE(a)	(sizeof (a) / sizeof ((a)[0]))
 #endif
 
+static struct ufs1_inode *
+ufs1_cg_inode_pull (const struct ufs_cg *c, int n, struct ufs1_inode *buf)
+{
+	const off_t base = ufs_cg_iblkno (c->sb, c->cg_cgx);
+	const off_t pos  = (base << c->sb->s_fshift) + n * sizeof (*buf);
+
+	if (pread (c->sb->fd, buf, sizeof (*buf), pos) != sizeof (*buf))
+		return NULL;
+
+	return buf;
+}
+
 static
 void ufs1_inode_show_db (const struct ufs_sb *s, const struct ufs1_inode *o)
 {
@@ -47,21 +59,18 @@ void ufs1_inode_show_db (const struct ufs_sb *s, const struct ufs1_inode *o)
 
 static int ufs1_inode_show (const struct ufs_cg *c, int n)
 {
-	const struct ufs_sb *s = c->sb;
-	struct ufs1_inode buf, *o = &buf;
-	off_t pos = ((off_t) ufs_cg_iblkno (s, c->cg_cgx) << s->s_fshift) +
-		    n * sizeof (*o);
+	struct ufs1_inode buf, *o;
 
 	if (!isset (ufs_cg_imap (c), n))
 		return 1;
 
-	if (pread (s->fd, &buf, sizeof (buf), pos) != sizeof (buf))
+	if ((o = ufs1_cg_inode_pull (c, n, &buf)) == NULL)
 		return 0;
 
 	fprintf (stderr, "I:     %2d: %06o %3d %4u %4u %8llu, %3u sectors",
 		 ufs_cg_ino (c, n), o->i_mode, o->i_nlink, o->i_uid, o->i_gid,
 		 (unsigned long long) o->i_size, o->i_blocks);
-	ufs1_inode_show_db (s, o);
+	ufs1_inode_show_db (c->sb, o);
 	fputc ('\n', stderr);
 	return 1;
 }
