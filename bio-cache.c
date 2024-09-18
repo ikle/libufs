@@ -1,7 +1,7 @@
 /*
  * Block Device I/O Cache
  *
- * Copyright (c) 2023 Alexei A. Smekalkine <ikle@ikle.ru>
+ * Copyright (c) 2023-2024 Alexei A. Smekalkine <ikle@ikle.ru>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
@@ -28,7 +28,7 @@ static size_t bio_cache_index (int dev, off_t offset)
 	return oat_hash_final (iv) & BIO_CACHE_MASK;
 }
 
-struct bio *bio_cache_lookup (int dev, off_t offset, size_t count)
+struct bio *bio_cache_pull (int dev, off_t offset, size_t count)
 {
 	const size_t i = bio_cache_index (dev, offset);
 	struct bio *o, *ret = NULL;

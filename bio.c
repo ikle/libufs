@@ -1,7 +1,7 @@
 /*
  * Block Device I/O
  *
- * Copyright (c) 2023 Alexei A. Smekalkine <ikle@ikle.ru>
+ * Copyright (c) 2023-2024 Alexei A. Smekalkine <ikle@ikle.ru>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
@@ -50,7 +50,7 @@ static void bio_free (struct bio *o)
 
 struct bio *bio_get (int dev, off_t offset, size_t count, int mode)
 {
-	struct bio *o = bio_cache_lookup (dev, offset, count);
+	struct bio *o = bio_cache_pull (dev, offset, count);
 
 	return o != NULL ? o : bio_alloc (dev, offset, count, mode);
 }
