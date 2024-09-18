@@ -235,12 +235,27 @@ static int ufs_cg_show_inodes (const struct ufs_cg *c)
 	return 1;
 }
 
-static void show_stat (const struct ufs1_cs *o)
+static void ufs1_show_stat (const struct ufs1_cs *o)
 {
 	fprintf (stderr, "N:     directories = %d\n", o->cs_ndir);
 	fprintf (stderr, "N:     free blocks = %d\n", o->cs_nbfree);
 	fprintf (stderr, "N:     free inodes = %d\n", o->cs_nifree);
 	fprintf (stderr, "N:     free frags  = %d\n", o->cs_nffree);
+}
+
+static void ufs_sb_show (const struct ufs_sb *o)
+{
+	fprintf (stderr, "I: Valid UFS1 super block found\n");
+	fprintf (stderr, "N:     block size  = %d\n", 1 << o->s_bshift);
+	fprintf (stderr, "N:     frag size   = %d\n", 1 << o->s_fshift);
+	ufs1_show_stat (&o->s_stat);
+}
+
+static void ufs_cg_show (const struct ufs_cg *o)
+{
+	fprintf (stderr, "I: Valid UFS1 cylinder group %u found\n", o->cg_cgx);
+	ufs1_show_stat (&o->cg_stat);
+	ufs_cg_show_inodes (o);
 }
 
 int main (int argc, char *argv[])
@@ -265,10 +280,7 @@ int main (int argc, char *argv[])
 		return 1;
 	}
 
-	fprintf (stderr, "I: Valid UFS1 super block found\n");
-	fprintf (stderr, "N:     block size  = %d\n", 1 << s.s_bshift);
-	fprintf (stderr, "N:     frag size   = %d\n", 1 << s.s_fshift);
-	show_stat (&s.s_stat);
+	ufs_sb_show (&s);
 
 	for (i = 0; i < s.s_ncg; ++i) {
 		if (!ufs_cg_init (&c, &s, i)) {
@@ -277,9 +289,7 @@ int main (int argc, char *argv[])
 			goto no_cg;
 		}
 
-		fprintf (stderr, "I: Valid UFS1 cylinder group %u found\n", i);
-		show_stat (&c.cg_stat);
-		ufs_cg_show_inodes (&c);
+		ufs_cg_show (&c);
 		ufs_cg_fini (&c);
 	}
 
