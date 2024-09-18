@@ -57,7 +57,7 @@ void ufs1_inode_show_db (const struct ufs_sb *s, const struct ufs1_inode *o)
 		fprintf (stderr, ", %d", o->i_db[i]);
 }
 
-static int ufs1_inode_show (const struct ufs_cg *c, int n)
+static int ufs1_cg_inode_show (const struct ufs_cg *c, int n)
 {
 	struct ufs1_inode buf, *o;
 
@@ -101,7 +101,7 @@ static int ufs_cg_show (const struct ufs_cg *o)
 	fprintf (stderr, "I: List of i-nodes:\n");
 
 	for (i = 0; i < o->cg_ipg; ++i)
-		if (!ufs1_inode_show (o, i)) {
+		if (!ufs1_cg_inode_show (o, i)) {
 			fprintf (stderr, "E: Cannot read inode %u\n",
 				 ufs_cg_ino (o, i));
 			ok = 0;
