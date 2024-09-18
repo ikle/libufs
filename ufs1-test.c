@@ -23,18 +23,6 @@
 #define ARRAY_SIZE(a)	(sizeof (a) / sizeof ((a)[0]))
 #endif
 
-static struct ufs1_inode *
-ufs1_cg_inode_pull (const struct ufs_cg *c, int n, struct ufs1_inode *buf)
-{
-	const off_t base = ufs_cg_iblkno (c->sb, c->cg_cgx);
-	const off_t pos  = (base << c->sb->s_fshift) + n * sizeof (*buf);
-
-	if (pread (c->sb->fd, buf, sizeof (*buf), pos) != sizeof (*buf))
-		return NULL;
-
-	return buf;
-}
-
 static
 void ufs1_inode_show_db (const struct ufs_sb *s, const struct ufs1_inode *o)
 {

@@ -88,4 +88,18 @@ static inline uint32_t ufs_cg_ino (const struct ufs_cg *o, uint32_t i)
 	return o->sb->s_ipg * o->cg_cgx + i;
 }
 
+#include <fs/ufs1-inode.h>
+
+static struct ufs1_inode *
+ufs1_cg_inode_pull (const struct ufs_cg *c, int n, struct ufs1_inode *buf)
+{
+	const off_t base = ufs_cg_iblkno (c->sb, c->cg_cgx);
+	const off_t pos  = (base << c->sb->s_fshift) + n * sizeof (*buf);
+
+	if (pread (c->sb->fd, buf, sizeof (*buf), pos) != sizeof (*buf))
+		return NULL;
+
+	return buf;
+}
+
 #endif  /* UFS_CG_H */
