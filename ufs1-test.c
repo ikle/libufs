@@ -1,7 +1,7 @@
 /*
  * UNIX File System v1 Test
  *
- * Copyright (c) 2023 Alexei A. Smekalkine <ikle@ikle.ru>
+ * Copyright (c) 2023-2024 Alexei A. Smekalkine <ikle@ikle.ru>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
@@ -31,17 +31,26 @@ struct ufs_sb {
 	struct ufs1_cs	s_stat;
 };
 
+static void ufs_sb_fini (struct ufs_sb *o)
+{
+	close (o->fd);
+}
+
+static int ufs_sb_error (struct ufs_sb *o)
+{
+	ufs_sb_fini (o);
+	return 0;
+}
+
 static int ufs_sb_init (struct ufs_sb *o, int fd)
 {
 	struct ufs1_sb buf, *s = &buf;
 
-	if (pread (fd, &buf, sizeof (buf), 8192) != sizeof (buf))
-		return 0;
-
-	o->fd = fd;
+	if (pread (o->fd = fd, &buf, sizeof (buf), 8192) != sizeof (buf))
+		return ufs_sb_error (o);
 
 	if (s->s_magic != UFS1_SB_MAGIC)
-		return 0;
+		return ufs_sb_error (o);
 
 	o->s_sblkno   = s->s_sblkno;
 	o->s_cblkno   = s->s_cblkno;
@@ -58,7 +67,7 @@ static int ufs_sb_init (struct ufs_sb *o, int fd)
 	    o->s_iblkno >= o->s_dblkno || o->s_dblkno >= o->s_fpg ||
 	    o->s_cgsize < sizeof (struct ufs1_cg) ||
 	    o->s_cgsize > (o->s_iblkno - o->s_cblkno) << s->s_fshift)
-		return 0;
+		return ufs_sb_error (o);
 
 	o->s_bshift = s->s_bshift;
 	o->s_fshift = s->s_fshift;
@@ -73,18 +82,13 @@ static int ufs_sb_init (struct ufs_sb *o, int fd)
 	    s->s_bmask != (~0L << o->s_bshift) ||
 	    s->s_fmask != (~0L << o->s_fshift) ||
 	    o->s_inopb != (s->s_bsize / 128))
-		return 0;
+		return ufs_sb_error (o);
 
 	if (s->s_maxembedded != 60 || s->s_inodefmt != 2)
-		return 0;
+		return ufs_sb_error (o);
 
 	o->s_stat = s->s_cstotal;
 	return 1;
-}
-
-static void ufs_sb_fini (struct ufs_sb *o)
-{
-	close (o->fd);
 }
 
 struct ufs_cg {
@@ -253,7 +257,7 @@ int main (int argc, char *argv[])
 
 	if (!ufs_sb_init (&s, fd)) {
 		fprintf (stderr, "E: Cannot find valid UFS1 super block\n");
-		goto no_sb;
+		return 1;
 	}
 
 	fprintf (stderr, "I: Valid UFS1 super block found\n");
@@ -278,7 +282,6 @@ int main (int argc, char *argv[])
 	return 0;
 no_cg:
 	ufs_cg_fini (&c);
-no_sb:
 	ufs_sb_fini (&s);
 	return 1;
 }
