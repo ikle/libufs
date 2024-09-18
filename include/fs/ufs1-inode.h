@@ -1,7 +1,7 @@
 /*
  * UNIX File System v1 on-disk inode, 128 bytes
  *
- * Copyright (c) 2023 Alexei A. Smekalkine <ikle@ikle.ru>
+ * Copyright (c) 2023-2024 Alexei A. Smekalkine <ikle@ikle.ru>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
@@ -30,7 +30,7 @@ union ufs1_data {
  *    position with Solaris fs_logbno (this probably should never be equal
  *    to 2 but who knows).
  * 3. User identifiers moved to new position to be 32-bit wide.
- * 4. The index fields i_db and i_di reused for short symlinks.
+ * 4. The index fields i_db and i_ib reused for short symlinks.
  * 5. FreeBSD 3.3 adds support for Soft Update Journal (SUJ), FreeBSD 9.0
  *    reuses old ids place as i_freelink.
  * 6. FreeBSD 8.0 adds i_modrev to support NFSv4.
