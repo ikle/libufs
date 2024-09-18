@@ -129,6 +129,17 @@ static inline uint8_t *ufs_cg_fmap (const struct ufs_cg *o)
 	return o->cg_data + o->cg_fmap_pos;
 }
 
+static void ufs_cg_fini (struct ufs_cg *o)
+{
+	free (o->cg_data);
+}
+
+static int ufs_cg_error (struct ufs_cg *o, const char *reason)
+{
+	free (o->cg_data);
+	return 0;
+}
+
 static int ufs_cg_init (struct ufs_cg *o, const struct ufs_sb *s, uint32_t cgx)
 {
 	struct ufs1_cg *c;
@@ -138,10 +149,10 @@ static int ufs_cg_init (struct ufs_cg *o, const struct ufs_sb *s, uint32_t cgx)
 		return 0;
 
 	if (pread (s->fd, c, s->s_cgsize, pos) != s->s_cgsize)
-		goto error;
+		return ufs_cg_error (o, "Cannot read cylinder group");
 
 	if (c->cg_magic != UFS1_CG_MAGIC)
-		goto error;
+		return ufs_cg_error (o, "Cannot find valid cylinder group magic");
 
 	o->cg_start = ufs_cg_start (s, cgx);
 	o->cg_cgx   = c->cg_cgx;
@@ -149,7 +160,7 @@ static int ufs_cg_init (struct ufs_cg *o, const struct ufs_sb *s, uint32_t cgx)
 	o->cg_fpg   = c->cg_fpg;
 
 	if (o->cg_ipg != s->s_ipg || o->cg_fpg > s->s_fpg)
-		goto error;
+		return ufs_cg_error (o, "Invalid cylinder group configuration");
 
 	o->cg_imap_pos = c->cg_iusedoff;
 	o->cg_fmap_pos = c->cg_freeoff;
@@ -159,18 +170,10 @@ static int ufs_cg_init (struct ufs_cg *o, const struct ufs_sb *s, uint32_t cgx)
 	    o->cg_imap_pos >= o->cg_fmap_pos ||
 	    (o->cg_fmap_pos - o->cg_imap_pos) < howmany (o->cg_ipg, 8) ||
 	    (o->cg_emap_pos - o->cg_fmap_pos) < howmany (o->cg_fpg, 8))
-		goto error;
+		return ufs_cg_error (o, "Invalid cylinder group layout");
 
 	o->cg_stat = c->cg_cs;
 	return 1;
-error:
-	free (o->cg_data);
-	return 0;
-}
-
-static void ufs_cg_fini (struct ufs_cg *o)
-{
-	free (o->cg_data);
 }
 
 static
