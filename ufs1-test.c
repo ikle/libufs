@@ -258,12 +258,31 @@ static void ufs_cg_show (const struct ufs_cg *o)
 	ufs_cg_show_inodes (o);
 }
 
+static int ufs_fs_show (const struct ufs_sb *sb)
+{
+	uint32_t i;
+	struct ufs_cg c;
+
+	ufs_sb_show (sb);
+
+	for (i = 0; i < sb->s_ncg; ++i) {
+		if (!ufs_cg_init (&c, sb, i)) {
+			fprintf (stderr, "E: Cannot find valid UFS1 "
+					 "cylinder group %u\n", i);
+			return 0;
+		}
+
+		ufs_cg_show (&c);
+		ufs_cg_fini (&c);
+	}
+
+	return 1;
+}
+
 int main (int argc, char *argv[])
 {
-	int fd;
+	int fd, ok;
 	struct ufs_sb s;
-	struct ufs_cg c;
-	uint32_t i;
 
 	if (argc != 2) {
 		fprintf (stderr, "usage:\n\tufs1-test <ufs1-image>\n");
@@ -280,22 +299,8 @@ int main (int argc, char *argv[])
 		return 1;
 	}
 
-	ufs_sb_show (&s);
-
-	for (i = 0; i < s.s_ncg; ++i) {
-		if (!ufs_cg_init (&c, &s, i)) {
-			fprintf (stderr, "E: Cannot find valid UFS1 "
-					 "cylinder group %u\n", i);
-			goto no_cg;
-		}
-
-		ufs_cg_show (&c);
-		ufs_cg_fini (&c);
-	}
+	ok = ufs_fs_show (&s);
 
 	ufs_sb_fini (&s);
-	return 0;
-no_cg:
-	ufs_sb_fini (&s);
-	return 1;
+	return ok ? 0 : 1;
 }
