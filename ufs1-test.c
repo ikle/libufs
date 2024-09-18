@@ -222,19 +222,6 @@ static int ufs1_inode_show (const struct ufs_cg *c, int n)
 	return 1;
 }
 
-static int ufs_cg_show_inodes (const struct ufs_cg *c)
-{
-	uint32_t i;
-
-	fprintf (stderr, "I: List of i-nodes:\n");
-
-	for (i = 0; i < c->cg_ipg; ++i)
-		if (!ufs1_inode_show (c, i))
-			return 0;
-
-	return 1;
-}
-
 static void ufs1_show_stat (const struct ufs1_cs *o)
 {
 	fprintf (stderr, "I:     directories = %d\n", o->cs_ndir);
@@ -251,11 +238,20 @@ static void ufs_sb_show (const struct ufs_sb *o)
 	ufs1_show_stat (&o->s_stat);
 }
 
-static void ufs_cg_show (const struct ufs_cg *o)
+static int ufs_cg_show (const struct ufs_cg *o)
 {
+	uint32_t i;
+
 	fprintf (stderr, "N: Valid UFS1 cylinder group %u found\n", o->cg_cgx);
 	ufs1_show_stat (&o->cg_stat);
-	ufs_cg_show_inodes (o);
+
+	fprintf (stderr, "I: List of i-nodes:\n");
+
+	for (i = 0; i < o->cg_ipg; ++i)
+		if (!ufs1_inode_show (o, i))
+			return 0;
+
+	return 1;
 }
 
 static int ufs_fs_show (const struct ufs_sb *sb)
