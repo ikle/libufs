@@ -91,14 +91,6 @@ static int ufs_sb_init (struct ufs_sb *o, int fd)
 	return 1;
 }
 
-struct ufs_cg {
-	void		*cg_data;
-	int32_t		cg_start;
-	uint32_t	cg_cgx, cg_ipg, cg_fpg;
-	uint32_t	cg_imap_pos, cg_fmap_pos, cg_emap_pos;
-	struct ufs1_cs	cg_stat;
-};
-
 static inline int32_t ufs_cg_start (const struct ufs_sb *o, uint32_t cgx)
 {
 	return o->s_fpg * cgx + o->s_cgoffset * (cgx & ~o->s_cgmask);
@@ -118,6 +110,14 @@ static inline int32_t ufs_cg_dblkno (const struct ufs_sb *o, uint32_t cgx)
 {
 	return ufs_cg_start (o, cgx) + o->s_dblkno;
 }
+
+struct ufs_cg {
+	void		*cg_data;
+	int32_t		cg_start;
+	uint32_t	cg_cgx, cg_ipg, cg_fpg;
+	uint32_t	cg_imap_pos, cg_fmap_pos, cg_emap_pos;
+	struct ufs1_cs	cg_stat;
+};
 
 static inline uint8_t *ufs_cg_imap (const struct ufs_cg *o)
 {
