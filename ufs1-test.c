@@ -84,8 +84,7 @@ static void ufs_sb_show (const struct ufs_sb *o)
 
 static int ufs_cg_show (const struct ufs_cg *o)
 {
-	int ok = 1;
-	uint32_t i;
+	int ok = 1, i;
 
 	fprintf (stderr, "N: Valid UFS1 cylinder group %u found\n", o->cg_cgx);
 	ufs1_show_stat (&o->cg_stat);
