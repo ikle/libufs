@@ -36,7 +36,7 @@ static void ufs_sb_fini (struct ufs_sb *o)
 	close (o->fd);
 }
 
-static int ufs_sb_error (struct ufs_sb *o)
+static int ufs_sb_error (struct ufs_sb *o, const char *reason)
 {
 	ufs_sb_fini (o);
 	return 0;
@@ -47,10 +47,10 @@ static int ufs_sb_init (struct ufs_sb *o, int fd)
 	struct ufs1_sb buf, *s = &buf;
 
 	if (pread (o->fd = fd, &buf, sizeof (buf), 8192) != sizeof (buf))
-		return ufs_sb_error (o);
+		return ufs_sb_error (o, "Cannot read super block");
 
 	if (s->s_magic != UFS1_SB_MAGIC)
-		return ufs_sb_error (o);
+		return ufs_sb_error (o, "Cannot find valid super block magic");
 
 	o->s_sblkno   = s->s_sblkno;
 	o->s_cblkno   = s->s_cblkno;
@@ -67,7 +67,7 @@ static int ufs_sb_init (struct ufs_sb *o, int fd)
 	    o->s_iblkno >= o->s_dblkno || o->s_dblkno >= o->s_fpg ||
 	    o->s_cgsize < sizeof (struct ufs1_cg) ||
 	    o->s_cgsize > (o->s_iblkno - o->s_cblkno) << s->s_fshift)
-		return ufs_sb_error (o);
+		return ufs_sb_error (o, "Invalid file system layout");
 
 	o->s_bshift = s->s_bshift;
 	o->s_fshift = s->s_fshift;
@@ -82,10 +82,10 @@ static int ufs_sb_init (struct ufs_sb *o, int fd)
 	    s->s_bmask != (~0L << o->s_bshift) ||
 	    s->s_fmask != (~0L << o->s_fshift) ||
 	    o->s_inopb != (s->s_bsize / 128))
-		return ufs_sb_error (o);
+		return ufs_sb_error (o, "Invalid file system configuration");
 
 	if (s->s_maxembedded != 60 || s->s_inodefmt != 2)
-		return ufs_sb_error (o);
+		return ufs_sb_error (o, "Unknown i-node format");
 
 	o->s_stat = s->s_cstotal;
 	return 1;
