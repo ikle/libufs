@@ -284,7 +284,6 @@ int main (int argc, char *argv[])
 	ufs_sb_fini (&s);
 	return 0;
 no_cg:
-	ufs_cg_fini (&c);
 	ufs_sb_fini (&s);
 	return 1;
 }
