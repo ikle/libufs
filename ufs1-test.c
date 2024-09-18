@@ -178,6 +178,11 @@ static int ufs_cg_init (struct ufs_cg *o, const struct ufs_sb *s, uint32_t cgx)
 	return 1;
 }
 
+static inline uint32_t ufs_cg_ino (const struct ufs_cg *o, uint32_t i)
+{
+	return o->sb->s_ipg * o->cg_cgx + i;
+}
+
 static
 void ufs1_inode_show_db (const struct ufs_sb *s, const struct ufs1_inode *o)
 {
@@ -206,7 +211,6 @@ static int ufs1_inode_show (const struct ufs_cg *c, int n)
 	struct ufs1_inode buf, *o = &buf;
 	off_t pos = ((off_t) ufs_cg_iblkno (s, c->cg_cgx) << s->s_fshift) +
 		    n * sizeof (*o);
-	uint32_t ino = s->s_ipg * c->cg_cgx + n;
 
 	if (!isset (ufs_cg_imap (c), n))
 		return 1;
@@ -215,7 +219,7 @@ static int ufs1_inode_show (const struct ufs_cg *c, int n)
 		return 0;
 
 	fprintf (stderr, "I:     %2d: %06o %3d %4u %4u %8llu, %3u sectors",
-		 ino, o->i_mode, o->i_nlink, o->i_uid, o->i_gid,
+		 ufs_cg_ino (c, n), o->i_mode, o->i_nlink, o->i_uid, o->i_gid,
 		 (unsigned long long) o->i_size, o->i_blocks);
 	ufs1_inode_show_db (s, o);
 	fputc ('\n', stderr);
