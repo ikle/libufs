@@ -161,7 +161,7 @@ static int ufs_cg_init (struct ufs_cg *o, const struct ufs_sb *s, uint32_t cgx)
 	o->cg_ipg   = c->cg_ipg;
 	o->cg_fpg   = c->cg_fpg;
 
-	if (o->cg_ipg != s->s_ipg || o->cg_fpg > s->s_fpg)
+	if (o->cg_cgx != cgx || o->cg_ipg != s->s_ipg || o->cg_fpg > s->s_fpg)
 		return ufs_cg_error (o, "Invalid cylinder group configuration");
 
 	o->cg_imap_pos = c->cg_iusedoff;
