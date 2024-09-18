@@ -1,7 +1,7 @@
 /*
  * UNIX File System v1 on-disk super block
  *
- * Copyright (c) 2023 Alexei A. Smekalkine <ikle@ikle.ru>
+ * Copyright (c) 2023-2024 Alexei A. Smekalkine <ikle@ikle.ru>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
@@ -61,7 +61,7 @@ struct ufs1_sb {
 	int32_t		s_bmask;	/* (d) = (~0 << s_bshift)	*/
 	int32_t		s_fmask;	/* (d) = (~0 << s_fshift)	*/
 	int32_t		s_bshift;	/*  +  = ilog2 (size of block)	*/
-	int32_t		s_fshift;	/* (c) = ilog2 (size of frag)	*/
+	int32_t		s_fshift;	/*  +  = ilog2 (size of frag)	*/
 	int32_t		s_maxcontig;	/* (c) max cluster length	*/
 	int32_t		s_maxbpg;	/* (c) max indirect blks per CG	*/
 	int32_t		s_fragshift;	/* (h) = (s_bshift - s_fshift)	*/
