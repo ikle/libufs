@@ -67,6 +67,48 @@ static void ufs1_inode_show_db (const struct ufs1_inode *o, int bshift)
 		fprintf (stderr, ", %d", o->i_db[i]);
 }
 
+static void *
+ufs1_inode_dir_pull (const struct ufs_cg *c, const struct ufs1_inode *o,
+		     uint64_t frag, void *buf)
+{
+	const uint64_t head  = (frag + 0) * UFS1_DFSIZE;
+	const uint64_t next  = (frag + 1) * UFS1_DFSIZE;
+	const uint32_t block = head >> c->sb->s_bshift;
+	const uint32_t offs  = head & ~(~0 << c->sb->s_bshift);
+	off_t pos;
+
+	if (next > o->i_size)
+		return NULL;
+
+	if (block >= ARRAY_SIZE (o->i_db))
+		return NULL;  /* indirect blocks not supported yet */
+
+	pos = ((off_t) o->i_db[block] << c->sb->s_fshift) + offs;
+
+	if (pread (c->sb->fd, buf, UFS1_DFSIZE, pos) != UFS1_DFSIZE)
+		return NULL;
+
+	return buf;
+}
+
+static void ufs1_dir_show (const struct ufs_cg *c, const struct ufs1_inode *o)
+{
+	char buf[UFS1_DFSIZE];
+	uint64_t i;
+	void *p, *end;
+	struct ufs1_dirent *d;
+
+	for (i = 0; (p = ufs1_inode_dir_pull (c, o, i, buf)) != NULL; ++i)
+		for (
+			d = p, end = p + UFS1_DFSIZE;
+			ufs1_dirent_valid (d, end - p);
+			d = (p += d->d_reclen)
+		)
+			if (d->d_ino != 0 && d->d_namlen > 0)
+				fprintf (stderr, "I:          %2d: %.*s\n",
+					 d->d_ino, d->d_namlen, d->d_name);
+}
+
 static int ufs1_cg_inode_show (const struct ufs_cg *c, int n)
 {
 	struct ufs1_inode buf, *o;
@@ -85,6 +127,10 @@ static int ufs1_cg_inode_show (const struct ufs_cg *c, int n)
 		 (unsigned long long) o->i_size, o->i_blocks);
 	ufs1_inode_show_db (o, c->sb->s_bshift);
 	fputc ('\n', stderr);
+
+	if (IFTODT (o->i_mode) == DT_DIR)
+		ufs1_dir_show (c, o);
+
 	return 1;
 }
 

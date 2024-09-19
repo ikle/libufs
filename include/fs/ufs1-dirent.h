@@ -9,6 +9,7 @@
 #ifndef SYS_FS_UFS1_DIRENT_H
 #define SYS_FS_UFS1_DIRENT_H  1
 
+#include <stddef.h>
 #include <stdint.h>
 
 #define UFS1_DFSIZE	512	/* directory fragment size */
@@ -47,5 +48,13 @@ struct ufs1_dirent {
 #define DTTOIF(type)	((type) << 12)
 
 #endif  /* DT_UNKNOWN */
+
+static inline int ufs1_dirent_valid (struct ufs1_dirent *o, size_t space)
+{
+	const int32_t core = offsetof (struct ufs1_dirent, d_name);
+
+	return space >= core && (o->d_reclen & 3) == 0 &&
+	       (o->d_reclen - core) >= o->d_namlen;
+}
 
 #endif  /* SYS_FS_UFS1_DIRENT_H */
