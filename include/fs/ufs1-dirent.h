@@ -1,7 +1,7 @@
 /*
  * UNIX File System v1 on-disk directory entry
  *
- * Copyright (c) 2023 Alexei A. Smekalkine <ikle@ikle.ru>
+ * Copyright (c) 2023-2024 Alexei A. Smekalkine <ikle@ikle.ru>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
@@ -16,7 +16,7 @@
 /*
  * Introduced by 4.4BSD, format version 2
  */
-union ufs1_dirent {
+struct ufs1_dirent {
 	int32_t		d_ino;		/* dirhash uses negative marks	*/
 	uint16_t	d_reclen;
 	uint8_t		d_type;
