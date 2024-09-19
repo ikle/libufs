@@ -23,6 +23,29 @@
 #define ARRAY_SIZE(a)	(sizeof (a) / sizeof ((a)[0]))
 #endif
 
+static void ufs1_show_mode (unsigned mode, FILE *to)
+{
+	const char *map = "0fc3d5b7-9lBsDwF";
+	const int type = IFTODT (mode);
+	const int suid = (mode & 04000) != 0;
+	const int sgid = (mode & 02000) != 0;
+	const int svtx = (mode & 01000) != 0;
+
+	fputc (map[type], to);
+
+	fputc (mode & 0400 ? 'r' : '-', to);
+	fputc (mode & 0200 ? 'w' : '-', to);
+	fputc (mode & 0100 ? suid ? 's' : 'x' : suid ? 'S' : '-', to);
+
+	fputc (mode & 0040 ? 'r' : '-', to);
+	fputc (mode & 0020 ? 'w' : '-', to);
+	fputc (mode & 0010 ? sgid ? 's' : 'x' : sgid ? 'S' : '-', to);
+
+	fputc (mode & 0004 ? 'r' : '-', to);
+	fputc (mode & 0002 ? 'w' : '-', to);
+	fputc (mode & 0001 ? svtx ? 't' : 'x' : svtx ? 'T' : '-', to);
+}
+
 static void ufs1_inode_show_db (const struct ufs1_inode *o, int bshift)
 {
 	const int count = MIN (ARRAY_SIZE (o->i_db),
@@ -54,8 +77,11 @@ static int ufs1_cg_inode_show (const struct ufs_cg *c, int n)
 	if ((o = ufs1_cg_inode_pull (c, n, &buf)) == NULL)
 		return 0;
 
-	fprintf (stderr, "I:     %2d: %06o %3d %4u %4u %8llu, %3u sectors",
-		 ufs_cg_ino (c, n), o->i_mode, o->i_nlink, o->i_uid, o->i_gid,
+	fprintf (stderr, "I:     %2d: ", ufs_cg_ino (c, n));
+	ufs1_show_mode (o->i_mode, stderr);
+
+	fprintf (stderr, " %3d %4u %4u %8llu, %3u sectors",
+		 o->i_nlink, o->i_uid, o->i_gid,
 		 (unsigned long long) o->i_size, o->i_blocks);
 	ufs1_inode_show_db (o, c->sb->s_bshift);
 	fputc ('\n', stderr);
