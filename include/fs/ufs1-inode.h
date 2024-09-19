@@ -62,4 +62,19 @@ struct ufs1_inode {
 #define i_content	i_data.content
 #endif
 
+static inline uint32_t ufs1_major (uint32_t rdev)
+{
+	return (rdev >> 8) & 0xff;
+}
+
+static inline uint32_t ufs1_minor (uint32_t rdev)
+{
+	return (rdev & 0xff) | ((rdev >> 8) & 0xffff00);
+}
+
+static inline uint32_t ufs1_makedev (uint32_t major, uint32_t minor)
+{
+	return (major << 8) | (minor & 0xff) | (minor & 0xffff00) << 8;
+}
+
 #endif  /* SYS_FS_UFS1_INODE_H */
