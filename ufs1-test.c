@@ -61,6 +61,12 @@ static void ufs1_inode_show_db (const struct ufs1_inode *o, int bshift)
 		return;
 	}
 
+	if (IFTODT (o->i_mode) == DT_CHR || IFTODT (o->i_mode) == DT_BLK) {
+		fprintf (stderr, " -> %u, %u",
+			 ufs1_major (o->i_rdev), ufs1_minor (o->i_rdev));
+		return;
+	}
+
 	fprintf (stderr, " at %d", o->i_db[0]);
 
 	for (i = 1; i < count; ++i)
