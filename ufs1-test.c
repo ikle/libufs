@@ -44,56 +44,6 @@ static void dev_block_put (void *o, size_t count)
 	free (o);
 }
 
-static void ufs1_show_mode (unsigned mode, FILE *to)
-{
-	const char *map = "0fc3d5b7-9lBsDwF";
-	const int type = IFTODT (mode);
-	const int suid = (mode & 04000) != 0;
-	const int sgid = (mode & 02000) != 0;
-	const int svtx = (mode & 01000) != 0;
-
-	fputc (map[type], to);
-
-	fputc (mode & 0400 ? 'r' : '-', to);
-	fputc (mode & 0200 ? 'w' : '-', to);
-	fputc (mode & 0100 ? suid ? 's' : 'x' : suid ? 'S' : '-', to);
-
-	fputc (mode & 0040 ? 'r' : '-', to);
-	fputc (mode & 0020 ? 'w' : '-', to);
-	fputc (mode & 0010 ? sgid ? 's' : 'x' : sgid ? 'S' : '-', to);
-
-	fputc (mode & 0004 ? 'r' : '-', to);
-	fputc (mode & 0002 ? 'w' : '-', to);
-	fputc (mode & 0001 ? svtx ? 't' : 'x' : svtx ? 'T' : '-', to);
-}
-
-static void ufs1_inode_show_db (const struct ufs1_inode *o, int bshift)
-{
-	const int count = MIN (ARRAY_SIZE (o->i_db),
-			       howmany (o->i_size, 1 << bshift));
-	int i;
-
-	if (o->i_size == 0)
-		return;
-
-	if (IFTODT (o->i_mode) == DT_LNK && o->i_size < 60 &&
-	    o->i_content[o->i_size] == '\0') {
-		fprintf (stderr, " -> %s", o->i_content);
-		return;
-	}
-
-	if (IFTODT (o->i_mode) == DT_CHR || IFTODT (o->i_mode) == DT_BLK) {
-		fprintf (stderr, " -> %u, %u",
-			 ufs1_major (o->i_rdev), ufs1_minor (o->i_rdev));
-		return;
-	}
-
-	fprintf (stderr, " at %d", o->i_db[0]);
-
-	for (i = 1; i < count; ++i)
-		fprintf (stderr, ", %d", o->i_db[i]);
-}
-
 static void *
 ufs1_inode_dir_pull (const struct ufs_cg *c, const struct ufs1_inode *o,
 		     uint64_t frag)
@@ -143,6 +93,56 @@ static void ufs1_dir_show (const struct ufs_cg *c, const struct ufs1_inode *o)
 		ufs1_dirent_show_frag (p);
 		dev_block_put (p, UFS1_DFSIZE);
 	}
+}
+
+static void ufs1_show_mode (unsigned mode, FILE *to)
+{
+	const char *map = "0fc3d5b7-9lBsDwF";
+	const int type = IFTODT (mode);
+	const int suid = (mode & 04000) != 0;
+	const int sgid = (mode & 02000) != 0;
+	const int svtx = (mode & 01000) != 0;
+
+	fputc (map[type], to);
+
+	fputc (mode & 0400 ? 'r' : '-', to);
+	fputc (mode & 0200 ? 'w' : '-', to);
+	fputc (mode & 0100 ? suid ? 's' : 'x' : suid ? 'S' : '-', to);
+
+	fputc (mode & 0040 ? 'r' : '-', to);
+	fputc (mode & 0020 ? 'w' : '-', to);
+	fputc (mode & 0010 ? sgid ? 's' : 'x' : sgid ? 'S' : '-', to);
+
+	fputc (mode & 0004 ? 'r' : '-', to);
+	fputc (mode & 0002 ? 'w' : '-', to);
+	fputc (mode & 0001 ? svtx ? 't' : 'x' : svtx ? 'T' : '-', to);
+}
+
+static void ufs1_inode_show_db (const struct ufs1_inode *o, int bshift)
+{
+	const int count = MIN (ARRAY_SIZE (o->i_db),
+			       howmany (o->i_size, 1 << bshift));
+	int i;
+
+	if (o->i_size == 0)
+		return;
+
+	if (IFTODT (o->i_mode) == DT_LNK && o->i_size < 60 &&
+	    o->i_content[o->i_size] == '\0') {
+		fprintf (stderr, " -> %s", o->i_content);
+		return;
+	}
+
+	if (IFTODT (o->i_mode) == DT_CHR || IFTODT (o->i_mode) == DT_BLK) {
+		fprintf (stderr, " -> %u, %u",
+			 ufs1_major (o->i_rdev), ufs1_minor (o->i_rdev));
+		return;
+	}
+
+	fprintf (stderr, " at %d", o->i_db[0]);
+
+	for (i = 1; i < count; ++i)
+		fprintf (stderr, ", %d", o->i_db[i]);
 }
 
 static int ufs1_cg_inode_show (const struct ufs_cg *c, int n)
