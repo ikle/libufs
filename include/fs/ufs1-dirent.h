@@ -49,7 +49,7 @@ struct ufs1_dirent {
 
 #endif  /* DT_UNKNOWN */
 
-static inline int ufs1_dirent_valid (struct ufs1_dirent *o, size_t space)
+static inline int ufs1_dirent_valid (const struct ufs1_dirent *o, size_t space)
 {
 	const int32_t core = offsetof (struct ufs1_dirent, d_name);
 
