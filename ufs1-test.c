@@ -23,6 +23,27 @@
 #define ARRAY_SIZE(a)	(sizeof (a) / sizeof ((a)[0]))
 #endif
 
+static void *dev_block_get (int dev, off_t offset, size_t count, int pull)
+{
+	void *o;
+
+	if ((o = malloc (count)) == NULL)
+		return o;
+
+	if (pull && pread (dev, o, count, offset) != count)
+		goto no_read;
+
+	return o;
+no_read:
+	free (o);
+	return NULL;
+}
+
+static void dev_block_put (void *o, size_t count)
+{
+	free (o);
+}
+
 static void ufs1_show_mode (unsigned mode, FILE *to)
 {
 	const char *map = "0fc3d5b7-9lBsDwF";
@@ -75,7 +96,7 @@ static void ufs1_inode_show_db (const struct ufs1_inode *o, int bshift)
 
 static void *
 ufs1_inode_dir_pull (const struct ufs_cg *c, const struct ufs1_inode *o,
-		     uint64_t frag, void *buf)
+		     uint64_t frag)
 {
 	const uint64_t head  = (frag + 0) * UFS1_DFSIZE;
 	const uint64_t next  = (frag + 1) * UFS1_DFSIZE;
@@ -91,10 +112,7 @@ ufs1_inode_dir_pull (const struct ufs_cg *c, const struct ufs1_inode *o,
 
 	pos = ((off_t) o->i_db[block] << c->sb->s_fshift) + offs;
 
-	if (pread (c->sb->fd, buf, UFS1_DFSIZE, pos) != UFS1_DFSIZE)
-		return NULL;
-
-	return buf;
+	return dev_block_get (c->sb->fd, pos, UFS1_DFSIZE, 1);
 }
 
 static void ufs1_dirent_show (const struct ufs1_dirent *o)
@@ -118,12 +136,13 @@ static void ufs1_dirent_show_frag (const void *frag)
 
 static void ufs1_dir_show (const struct ufs_cg *c, const struct ufs1_inode *o)
 {
-	char buf[UFS1_DFSIZE];
 	uint64_t i;
 	void *p;
 
-	for (i = 0; (p = ufs1_inode_dir_pull (c, o, i, buf)) != NULL; ++i)
+	for (i = 0; (p = ufs1_inode_dir_pull (c, o, i)) != NULL; ++i) {
 		ufs1_dirent_show_frag (p);
+		dev_block_put (p, UFS1_DFSIZE);
+	}
 }
 
 static int ufs1_cg_inode_show (const struct ufs_cg *c, int n)
