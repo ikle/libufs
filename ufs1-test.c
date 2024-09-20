@@ -118,31 +118,52 @@ static void ufs1_show_mode (unsigned mode, FILE *to)
 	fputc (mode & 0001 ? svtx ? 't' : 'x' : svtx ? 'T' : '-', to);
 }
 
-static void ufs1_inode_show_db (const struct ufs1_inode *o, int bshift)
+static
+void ufs1_inode_show_blocks (const struct ufs_cg *c, const struct ufs1_inode *o)
 {
-	const int count = MIN (ARRAY_SIZE (o->i_db),
-			       howmany (o->i_size, 1 << bshift));
-	int i;
+	const uint64_t count  = howmany (o->i_size, 1u << c->sb->s_bshift);
+	const size_t count_l1 = MIN (ARRAY_SIZE (o->i_db), count);
+	size_t i;
 
 	if (o->i_size == 0)
 		return;
 
-	if (IFTODT (o->i_mode) == DT_LNK && o->i_size < 60 &&
-	    o->i_content[o->i_size] == '\0') {
-		fprintf (stderr, " -> %s", o->i_content);
-		return;
-	}
-
-	if (IFTODT (o->i_mode) == DT_CHR || IFTODT (o->i_mode) == DT_BLK) {
-		fprintf (stderr, " -> %u, %u",
-			 ufs1_major (o->i_rdev), ufs1_minor (o->i_rdev));
-		return;
-	}
-
 	fprintf (stderr, " at %d", o->i_db[0]);
 
-	for (i = 1; i < count; ++i)
+	for (i = 1; i < count_l1; ++i)
 		fprintf (stderr, ", %d", o->i_db[i]);
+}
+
+static
+void ufs1_inode_show_link (const struct ufs_cg *c, const struct ufs1_inode *o)
+{
+	if (o->i_size < 60 && o->i_content[o->i_size] == '\0')
+		fprintf (stderr, " -> %s\n", o->i_content);
+	else
+		ufs1_inode_show_blocks (c, o);
+}
+
+static
+void ufs1_inode_show_rdev (const struct ufs_cg *c, const struct ufs1_inode *o)
+{
+	fprintf (stderr, " -> %u, %u\n",
+		 ufs1_major (o->i_rdev), ufs1_minor (o->i_rdev));
+}
+
+static
+void ufs1_inode_show_data (const struct ufs_cg *c, const struct ufs1_inode *o)
+{
+	switch (IFTODT (o->i_mode)) {
+	case DT_LNK:	ufs1_inode_show_link   (c, o); break;
+	case DT_CHR:
+	case DT_BLK:	ufs1_inode_show_rdev   (c, o); break;
+	default:	ufs1_inode_show_blocks (c, o); break;
+	}
+
+	fputc ('\n', stderr);
+
+	if (IFTODT (o->i_mode) == DT_DIR)
+		ufs1_dir_show (c, o);
 }
 
 static int ufs1_cg_inode_show (const struct ufs_cg *c, int n)
@@ -161,12 +182,7 @@ static int ufs1_cg_inode_show (const struct ufs_cg *c, int n)
 	fprintf (stderr, " %3d %4u %4u %8llu, %3u sectors",
 		 o->i_nlink, o->i_uid, o->i_gid,
 		 (unsigned long long) o->i_size, o->i_blocks);
-	ufs1_inode_show_db (o, c->sb->s_bshift);
-	fputc ('\n', stderr);
-
-	if (IFTODT (o->i_mode) == DT_DIR)
-		ufs1_dir_show (c, o);
-
+	ufs1_inode_show_data (c, o);
 	return 1;
 }
 
