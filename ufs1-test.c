@@ -132,6 +132,9 @@ void ufs1_inode_show_blocks (const struct ufs_cg *c, const struct ufs1_inode *o)
 
 	for (i = 1; i < count_l1; ++i)
 		fprintf (stderr, ", %d", o->i_db[i]);
+
+	if (count > count_l1)
+		fprintf (stderr, ", ...");
 }
 
 static
