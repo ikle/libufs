@@ -97,22 +97,33 @@ ufs1_inode_dir_pull (const struct ufs_cg *c, const struct ufs1_inode *o,
 	return buf;
 }
 
+static void ufs1_dirent_show (const struct ufs1_dirent *o)
+{
+	if (o->d_ino != 0 && o->d_namlen > 0)
+		fprintf (stderr, "I:          %2d: %.*s\n",
+			 o->d_ino, o->d_namlen, o->d_name);
+}
+
+static void ufs1_dirent_show_frag (const void *frag)
+{
+	const void *p, *end;
+
+	for (
+		p = frag, end = p + UFS1_DFSIZE;
+		ufs1_dirent_valid (p, end - p);
+		p = ufs1_dirent_next (p)
+	)
+		ufs1_dirent_show (p);
+}
+
 static void ufs1_dir_show (const struct ufs_cg *c, const struct ufs1_inode *o)
 {
 	char buf[UFS1_DFSIZE];
 	uint64_t i;
-	void *p, *end;
-	struct ufs1_dirent *d;
+	void *p;
 
 	for (i = 0; (p = ufs1_inode_dir_pull (c, o, i, buf)) != NULL; ++i)
-		for (
-			d = p, end = p + UFS1_DFSIZE;
-			ufs1_dirent_valid (d, end - p);
-			d = (p += d->d_reclen)
-		)
-			if (d->d_ino != 0 && d->d_namlen > 0)
-				fprintf (stderr, "I:          %2d: %.*s\n",
-					 d->d_ino, d->d_namlen, d->d_name);
+		ufs1_dirent_show_frag (p);
 }
 
 static int ufs1_cg_inode_show (const struct ufs_cg *c, int n)
