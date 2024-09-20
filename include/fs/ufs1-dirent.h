@@ -57,4 +57,9 @@ static inline int ufs1_dirent_valid (const struct ufs1_dirent *o, size_t space)
 	       (o->d_reclen - core) >= o->d_namlen;
 }
 
+static inline struct ufs1_dirent *ufs1_dirent_next (const struct ufs1_dirent *o)
+{
+	return (void *) o + o->d_reclen;
+}
+
 #endif  /* SYS_FS_UFS1_DIRENT_H */
