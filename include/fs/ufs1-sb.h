@@ -9,16 +9,9 @@
 #ifndef SYS_FS_UFS1_SB_H
 #define SYS_FS_UFS1_SB_H  1
 
-#include <stdint.h>
+#include <fs/ufs1-stat.h>
 
 #define UFS1_SB_MAGIC	0x00011954
-
-struct ufs1_cs {
-	int32_t		cs_ndir;	/* number of directories	*/
-	int32_t		cs_nbfree;	/* number of free blocks	*/
-	int32_t		cs_nifree;	/* number of free inodes	*/
-	int32_t		cs_nffree;	/* number of free frags		*/
-};
 
 /*
  * On-disk SB format version 2
