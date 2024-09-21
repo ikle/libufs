@@ -1,5 +1,5 @@
 /*
- * UFS Cylonder Group
+ * UFS Cylinder Group
  *
  * Copyright (c) 2023-2024 Alexei A. Smekalkine <ikle@ikle.ru>
  *
