@@ -20,7 +20,7 @@
  * 2. Magic field position moved.
  * 3. Added support for more than 32 cylinders per CG.
  * 4. FreeBSD 2.0.5 adds cluster support.
- * 5. FreeBSD 5.0 removes support for cg_ncyl, cg_btot abd cg_b.
+ * 5. FreeBSD 5.0 removes support for cg_ncyl, cg_btot and cg_b.
  */
 struct ufs1_cg {
 	int32_t		cg_link;	/* (-) linked list of CGs	*/
