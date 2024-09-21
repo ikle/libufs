@@ -1,5 +1,5 @@
 /*
- * UNIX File System v1 on-disk super block
+ * UNIX File System v1 On-Disk Super Block
  *
  * Copyright (c) 2023-2024 Alexei A. Smekalkine <ikle@ikle.ru>
  *
