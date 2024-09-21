@@ -57,18 +57,4 @@ static inline void ufs1_cg_inode_put (struct ufs1_inode *o)
 	dev_block_put (o, sizeof (*o));
 }
 
-#include <unistd.h>
-
-static inline struct ufs1_inode *
-ufs1_cg_inode_pull (const struct ufs_cg *c, int n, struct ufs1_inode *buf)
-{
-	const off_t base = ufs_cg_iblkno (c->sb, c->cg_cgx);
-	const off_t pos  = (base << c->sb->s_fshift) + n * sizeof (*buf);
-
-	if (pread (c->sb->dev, buf, sizeof (*buf), pos) != sizeof (*buf))
-		return NULL;
-
-	return buf;
-}
-
 #endif  /* UFS_CG_H */
