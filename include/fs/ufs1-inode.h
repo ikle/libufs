@@ -11,6 +11,10 @@
 
 #include <stdint.h>
 
+#ifndef ARRAY_SIZE
+#define ARRAY_SIZE(a)	(sizeof (a) / sizeof ((a)[0]))
+#endif
+
 union ufs1_data {
 	struct {
 		int32_t db[12];		/* direct disk blocks		*/

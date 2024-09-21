@@ -20,10 +20,6 @@
 #include "dev-block.h"
 #include "ufs-cg.h"
 
-#ifndef ARRAY_SIZE
-#define ARRAY_SIZE(a)	(sizeof (a) / sizeof ((a)[0]))
-#endif
-
 static void *
 ufs1_inode_dir_pull (const struct ufs_cg *c, const struct ufs1_inode *o,
 		     uint64_t frag)
