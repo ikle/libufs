@@ -26,12 +26,12 @@ void ufs1_cg_fini (struct ufs1_cg *o);
 
 static inline uint8_t *ufs1_cg_imap (const struct ufs1_cg *o)
 {
-	return o->cg_data + o->cg_imap_pos;
+	return o->cg_data + o->cg_imap_pos;	/* [(cg_ipg + 7) / 8] */
 }
 
 static inline uint8_t *ufs1_cg_fmap (const struct ufs1_cg *o)
 {
-	return o->cg_data + o->cg_fmap_pos;
+	return o->cg_data + o->cg_fmap_pos;	/* [(cg_fpg + 7) / 8] */
 }
 
 static inline uint32_t ufs1_cg_ino (const struct ufs1_cg *o, uint32_t i)
