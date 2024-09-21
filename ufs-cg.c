@@ -6,21 +6,19 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-#include <stdlib.h>
-
 #include <sys/param.h>
-#include <unistd.h>
 
+#include "dev-block.h"
 #include "ufs-cg.h"
 
 void ufs_cg_fini (struct ufs_cg *o)
 {
-	free (o->cg_data);
+	dev_block_put (o->cg_data, o->sb->s_cgsize);
 }
 
 static inline int ufs_cg_error (struct ufs_cg *o, const char *reason)
 {
-	free (o->cg_data);
+	ufs_cg_fini (o);
 	return 0;
 }
 
@@ -29,13 +27,10 @@ int ufs_cg_init (struct ufs_cg *o, const struct ufs_sb *s, uint32_t cgx)
 	struct ufs1_cg *c;
 	off_t pos = (off_t) ufs_cg_cblkno (o->sb = s, cgx) << s->s_fshift;
 
-	if ((c = o->cg_data = malloc (s->s_cgsize)) == NULL)
+	if ((o->cg_data = dev_block_get (s->fd, pos, s->s_cgsize, 1)) == NULL)
 		return 0;
 
-	if (pread (s->fd, c, s->s_cgsize, pos) != s->s_cgsize)
-		return ufs_cg_error (o, "Cannot read cylinder group");
-
-	if (c->cg_magic != UFS1_CG_MAGIC)
+	if ((c = o->cg_data)->cg_magic != UFS1_CG_MAGIC)
 		return ufs_cg_error (o, "Cannot find valid cylinder group magic");
 
 	o->cg_start = ufs_cg_start (s, cgx);
