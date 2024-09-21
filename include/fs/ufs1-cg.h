@@ -22,7 +22,7 @@
  * 4. FreeBSD 2.0.5 adds cluster support.
  * 5. FreeBSD 5.0 removes support for cg_ncyl, cg_btot and cg_b.
  */
-struct ufs1_cg {
+struct ufs1_cg_v2 {
 	int32_t		cg_link;	/* (-) linked list of CGs	*/
 	int32_t		cg_magic;
 	uint32_t	cg_time;	/* (s) time last written	*/
@@ -47,33 +47,33 @@ struct ufs1_cg {
 	uint8_t		cg_space[];	/* space for CG maps		*/
 };
 
-static inline int32_t *ufs1_cg_btot (struct ufs1_cg *o)
+static inline int32_t *ufs1_cg_btot (struct ufs1_cg_v2 *o)
 {
 	return (void *) o + o->cg_btotoff;	/* [s_cpg] */
 }
 
 static inline
-int16_t *ufs1_cg_b (const struct ufs1_sb *s, struct ufs1_cg *o, int cylno)
+int16_t *ufs1_cg_b (const struct ufs1_sb *s, struct ufs1_cg_v2 *o, int cylno)
 {
 	return (int16_t *) ((void *) o + o->cg_boff) + s->s_nrpos * cylno;  /* [s_cpg * s_nrpos] */
 }
 
-static inline uint8_t *ufs1_cg_imap (struct ufs1_cg *o)
+static inline uint8_t *ufs1_cg_imap (struct ufs1_cg_v2 *o)
 {
 	return (void *) o + o->cg_iusedoff;	/* [(s_ipg + 7) / 8] */
 }
 
-static inline uint8_t *ufs1_cg_dmap (struct ufs1_cg *o)
+static inline uint8_t *ufs1_cg_dmap (struct ufs1_cg_v2 *o)
 {
 	return (void *) o + o->cg_freeoff;	/* [(s_fpg + 7) / 8] */
 }
 
-static inline int32_t *ufs1_cg_cstat (struct ufs1_cg *o)
+static inline int32_t *ufs1_cg_cstat (struct ufs1_cg_v2 *o)
 {
 	return (void *) o + o->cg_clustersumoff;  /* [s_contigsumsize] */
 }
 
-static inline uint8_t *ufs1_cg_cmap (struct ufs1_cg *o)
+static inline uint8_t *ufs1_cg_cmap (struct ufs1_cg_v2 *o)
 {
 	return (void *) o + o->cg_clusteroff;	/* [cg_nclusterblks] */
 }

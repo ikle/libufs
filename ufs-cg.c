@@ -26,7 +26,7 @@ static inline int ufs_cg_error (struct ufs_cg *o, const char *reason)
 int ufs_cg_init (struct ufs_cg *o, const struct ufs_sb *s, uint32_t cgx)
 {
 	const off_t pos = (off_t) ufs_cg_cblkno (o->sb = s, cgx) << s->s_fshift;
-	struct ufs1_cg *c;
+	struct ufs1_cg_v2 *c;
 
 	if ((o->cg_data = dev_block_get (s->dev, pos, s->s_cgsize, 1)) == NULL)
 		return 0;

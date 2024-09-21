@@ -56,7 +56,7 @@ static inline int ufs_sb_init (struct ufs_sb *o, int dev)
 
 	if (o->s_sblkno >= o->s_cblkno || o->s_cblkno >= o->s_iblkno ||
 	    o->s_iblkno >= o->s_dblkno || o->s_dblkno >= o->s_fpg ||
-	    o->s_cgsize < sizeof (struct ufs1_cg) ||
+	    o->s_cgsize < sizeof (struct ufs1_cg_v2) ||
 	    o->s_cgsize > (o->s_iblkno - o->s_cblkno) << s->s_fshift)
 		return ufs_sb_error (o, "Invalid file system layout");
 
