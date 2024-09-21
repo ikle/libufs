@@ -38,7 +38,7 @@ ufs1_inode_dir_pull (const struct ufs_cg *c, const struct ufs1_inode *o,
 
 	pos = ((off_t) o->i_db[block] << c->sb->s_fshift) + offs;
 
-	return dev_block_get (c->sb->fd, pos, UFS1_DFSIZE, 1);
+	return dev_block_get (c->sb->dev, pos, UFS1_DFSIZE, 1);
 }
 
 static void ufs1_dirent_show (const struct ufs1_dirent *o)

@@ -27,7 +27,7 @@ int ufs_cg_init (struct ufs_cg *o, const struct ufs_sb *s, uint32_t cgx)
 	struct ufs1_cg *c;
 	off_t pos = (off_t) ufs_cg_cblkno (o->sb = s, cgx) << s->s_fshift;
 
-	if ((o->cg_data = dev_block_get (s->fd, pos, s->s_cgsize, 1)) == NULL)
+	if ((o->cg_data = dev_block_get (s->dev, pos, s->s_cgsize, 1)) == NULL)
 		return 0;
 
 	if ((c = o->cg_data)->cg_magic != UFS1_CG_MAGIC)

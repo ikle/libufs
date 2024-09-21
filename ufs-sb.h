@@ -14,7 +14,7 @@
 #include <fs/ufs1-cg.h>
 
 struct ufs_sb {
-	int		fd;
+	int		dev;
 	uint32_t	s_sblkno, s_cblkno, s_iblkno, s_dblkno;
 	int32_t		s_cgoffset, s_cgmask;
 	uint32_t	s_ncg, s_bshift, s_fshift, s_inopb;
@@ -24,7 +24,7 @@ struct ufs_sb {
 
 static inline void ufs_sb_fini (struct ufs_sb *o)
 {
-	close (o->fd);
+	close (o->dev);
 }
 
 static inline int ufs_sb_error (struct ufs_sb *o, const char *reason)
@@ -33,11 +33,11 @@ static inline int ufs_sb_error (struct ufs_sb *o, const char *reason)
 	return 0;
 }
 
-static inline int ufs_sb_init (struct ufs_sb *o, int fd)
+static inline int ufs_sb_init (struct ufs_sb *o, int dev)
 {
 	struct ufs1_sb buf, *s = &buf;
 
-	if (pread (o->fd = fd, &buf, sizeof (buf), 8192) != sizeof (buf))
+	if (pread (o->dev = dev, &buf, sizeof (buf), 8192) != sizeof (buf))
 		return ufs_sb_error (o, "Cannot read super block");
 
 	if (s->s_magic != UFS1_SB_MAGIC)

@@ -49,7 +49,7 @@ ufs1_cg_inode_pull (const struct ufs_cg *c, int n, struct ufs1_inode *buf)
 	const off_t base = ufs_cg_iblkno (c->sb, c->cg_cgx);
 	const off_t pos  = (base << c->sb->s_fshift) + n * sizeof (*buf);
 
-	if (pread (c->sb->fd, buf, sizeof (*buf), pos) != sizeof (*buf))
+	if (pread (c->sb->dev, buf, sizeof (*buf), pos) != sizeof (*buf))
 		return NULL;
 
 	return buf;
