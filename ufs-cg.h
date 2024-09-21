@@ -36,18 +36,19 @@ static inline uint8_t *ufs_cg_fmap (const struct ufs_cg *o)
 	return o->cg_data + o->cg_fmap_pos;
 }
 
-static void ufs_cg_fini (struct ufs_cg *o)
+static inline void ufs_cg_fini (struct ufs_cg *o)
 {
 	free (o->cg_data);
 }
 
-static int ufs_cg_error (struct ufs_cg *o, const char *reason)
+static inline int ufs_cg_error (struct ufs_cg *o, const char *reason)
 {
 	free (o->cg_data);
 	return 0;
 }
 
-static int ufs_cg_init (struct ufs_cg *o, const struct ufs_sb *s, uint32_t cgx)
+static inline
+int ufs_cg_init (struct ufs_cg *o, const struct ufs_sb *s, uint32_t cgx)
 {
 	struct ufs1_cg *c;
 	off_t pos = (off_t) ufs_cg_cblkno (o->sb = s, cgx) << s->s_fshift;
@@ -90,7 +91,7 @@ static inline uint32_t ufs_cg_ino (const struct ufs_cg *o, uint32_t i)
 
 #include <fs/ufs1-inode.h>
 
-static struct ufs1_inode *
+static inline struct ufs1_inode *
 ufs1_cg_inode_pull (const struct ufs_cg *c, int n, struct ufs1_inode *buf)
 {
 	const off_t base = ufs_cg_iblkno (c->sb, c->cg_cgx);
