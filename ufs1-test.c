@@ -18,10 +18,10 @@
 #include <fs/ufs1-inode.h>
 #include <marten/device/block.h>
 
-#include "ufs-cg.h"
+#include "ufs1-cg.h"
 
 static void *
-ufs1_inode_dir_pull (const struct ufs_cg *c, const struct ufs1_inode *o,
+ufs1_inode_dir_pull (const struct ufs1_cg *c, const struct ufs1_inode *o,
 		     uint64_t frag)
 {
 	const uint64_t head  = (frag + 0) * UFS1_DFSIZE;
@@ -60,7 +60,7 @@ static void ufs1_dirent_show_frag (const void *frag)
 		ufs1_dirent_show (p);
 }
 
-static void ufs1_dir_show (const struct ufs_cg *c, const struct ufs1_inode *o)
+static void ufs1_dir_show (const struct ufs1_cg *c, const struct ufs1_inode *o)
 {
 	uint64_t i;
 	void *p;
@@ -94,8 +94,8 @@ static void ufs1_show_mode (unsigned mode, FILE *to)
 	fputc (mode & 0001 ? svtx ? 't' : 'x' : svtx ? 'T' : '-', to);
 }
 
-static
-void ufs1_inode_show_blocks (const struct ufs_cg *c, const struct ufs1_inode *o)
+static void
+ufs1_inode_show_blocks (const struct ufs1_cg *c, const struct ufs1_inode *o)
 {
 	const uint64_t count  = howmany (o->i_size, 1u << c->sb->s_bshift);
 	const size_t count_l1 = MIN (ARRAY_SIZE (o->i_db), count);
@@ -114,7 +114,7 @@ void ufs1_inode_show_blocks (const struct ufs_cg *c, const struct ufs1_inode *o)
 }
 
 static
-void ufs1_inode_show_link (const struct ufs_cg *c, const struct ufs1_inode *o)
+void ufs1_inode_show_link (const struct ufs1_cg *c, const struct ufs1_inode *o)
 {
 	if (o->i_size < 60 && o->i_content[o->i_size] == '\0')
 		fprintf (stderr, " -> %s\n", o->i_content);
@@ -123,14 +123,14 @@ void ufs1_inode_show_link (const struct ufs_cg *c, const struct ufs1_inode *o)
 }
 
 static
-void ufs1_inode_show_rdev (const struct ufs_cg *c, const struct ufs1_inode *o)
+void ufs1_inode_show_rdev (const struct ufs1_cg *c, const struct ufs1_inode *o)
 {
 	fprintf (stderr, " -> %u, %u\n",
 		 ufs1_major (o->i_rdev), ufs1_minor (o->i_rdev));
 }
 
 static
-void ufs1_inode_show_data (const struct ufs_cg *c, const struct ufs1_inode *o)
+void ufs1_inode_show_data (const struct ufs1_cg *c, const struct ufs1_inode *o)
 {
 	switch (IFTODT (o->i_mode)) {
 	case DT_LNK:	ufs1_inode_show_link   (c, o); break;
@@ -145,17 +145,17 @@ void ufs1_inode_show_data (const struct ufs_cg *c, const struct ufs1_inode *o)
 		ufs1_dir_show (c, o);
 }
 
-static int ufs1_cg_inode_show (const struct ufs_cg *c, int n)
+static int ufs1_cg_inode_show (const struct ufs1_cg *c, int n)
 {
 	struct ufs1_inode *o;
 
-	if (!isset (ufs_cg_imap (c), n))
+	if (!isset (ufs1_cg_imap (c), n))
 		return 1;
 
 	if ((o = ufs1_cg_inode_get (c, n, 1)) == NULL)
 		return 0;
 
-	fprintf (stderr, "I:     %2d: ", ufs_cg_ino (c, n));
+	fprintf (stderr, "I:     %2d: ", ufs1_cg_ino (c, n));
 	ufs1_show_mode (o->i_mode, stderr);
 
 	fprintf (stderr, " %3d %4u %4u %8llu, %3u sectors",
@@ -182,7 +182,7 @@ static void ufs_sb_show (const struct ufs_sb *o)
 	ufs1_show_stat (&o->s_stat);
 }
 
-static int ufs_cg_show (const struct ufs_cg *o)
+static int ufs_cg_show (const struct ufs1_cg *o)
 {
 	int ok = 1, i;
 
@@ -194,7 +194,7 @@ static int ufs_cg_show (const struct ufs_cg *o)
 	for (i = 0; i < o->cg_ipg; ++i)
 		if (!ufs1_cg_inode_show (o, i)) {
 			fprintf (stderr, "E: Cannot read inode %u\n",
-				 ufs_cg_ino (o, i));
+				 ufs1_cg_ino (o, i));
 			ok = 0;
 			continue;
 		}
@@ -206,12 +206,12 @@ static int ufs_fs_show (const struct ufs_sb *sb)
 {
 	int ok = 1;
 	uint32_t i;
-	struct ufs_cg c;
+	struct ufs1_cg c;
 
 	ufs_sb_show (sb);
 
 	for (i = 0; i < sb->s_ncg; ++i) {
-		if (!ufs_cg_init (&c, sb, i)) {
+		if (!ufs1_cg_init (&c, sb, i)) {
 			fprintf (stderr, "E: Cannot find valid UFS1 "
 					 "cylinder group %u\n", i);
 			ok = 0;
@@ -219,7 +219,7 @@ static int ufs_fs_show (const struct ufs_sb *sb)
 		}
 
 		ok &= ufs_cg_show (&c);
-		ufs_cg_fini (&c);
+		ufs1_cg_fini (&c);
 	}
 
 	return ok;

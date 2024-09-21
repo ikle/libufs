@@ -47,7 +47,7 @@ struct ufs1_cg_v2 {
 	uint8_t		cg_space[];	/* space for CG maps		*/
 };
 
-static inline int32_t *ufs1_cg_btot (struct ufs1_cg_v2 *o)
+static inline int32_t *ufs1_cg_v2_btot (struct ufs1_cg_v2 *o)
 {
 	return (void *) o + o->cg_btotoff;	/* [s_cpg] */
 }
@@ -58,22 +58,22 @@ int16_t *ufs1_cg_b (const struct ufs1_sb *s, struct ufs1_cg_v2 *o, int cylno)
 	return (int16_t *) ((void *) o + o->cg_boff) + s->s_nrpos * cylno;  /* [s_cpg * s_nrpos] */
 }
 
-static inline uint8_t *ufs1_cg_imap (struct ufs1_cg_v2 *o)
+static inline uint8_t *ufs1_cg_v2_imap (struct ufs1_cg_v2 *o)
 {
 	return (void *) o + o->cg_iusedoff;	/* [(s_ipg + 7) / 8] */
 }
 
-static inline uint8_t *ufs1_cg_dmap (struct ufs1_cg_v2 *o)
+static inline uint8_t *ufs1_cg_v2_dmap (struct ufs1_cg_v2 *o)
 {
 	return (void *) o + o->cg_freeoff;	/* [(s_fpg + 7) / 8] */
 }
 
-static inline int32_t *ufs1_cg_cstat (struct ufs1_cg_v2 *o)
+static inline int32_t *ufs1_cg_v2_cstat (struct ufs1_cg_v2 *o)
 {
 	return (void *) o + o->cg_clustersumoff;  /* [s_contigsumsize] */
 }
 
-static inline uint8_t *ufs1_cg_cmap (struct ufs1_cg_v2 *o)
+static inline uint8_t *ufs1_cg_v2_cmap (struct ufs1_cg_v2 *o)
 {
 	return (void *) o + o->cg_clusteroff;	/* [cg_nclusterblks] */
 }
