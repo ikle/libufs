@@ -147,12 +147,12 @@ void ufs1_inode_show_data (const struct ufs_cg *c, const struct ufs1_inode *o)
 
 static int ufs1_cg_inode_show (const struct ufs_cg *c, int n)
 {
-	struct ufs1_inode buf, *o;
+	struct ufs1_inode *o;
 
 	if (!isset (ufs_cg_imap (c), n))
 		return 1;
 
-	if ((o = ufs1_cg_inode_pull (c, n, &buf)) == NULL)
+	if ((o = ufs1_cg_inode_get (c, n, 1)) == NULL)
 		return 0;
 
 	fprintf (stderr, "I:     %2d: ", ufs_cg_ino (c, n));
@@ -162,6 +162,7 @@ static int ufs1_cg_inode_show (const struct ufs_cg *c, int n)
 		 o->i_nlink, o->i_uid, o->i_gid,
 		 (unsigned long long) o->i_size, o->i_blocks);
 	ufs1_inode_show_data (c, o);
+	ufs1_cg_inode_put (o);
 	return 1;
 }
 
