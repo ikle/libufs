@@ -12,7 +12,7 @@
 #include "ufs-sb.h"
 
 struct ufs1_cg {
-	const struct ufs_sb *sb;
+	struct ufs_sb *sb;
 
 	void		*data;
 	int32_t		start;
@@ -21,7 +21,7 @@ struct ufs1_cg {
 	struct ufs1_cs	stat;
 };
 
-int  ufs1_cg_init (struct ufs1_cg *o, const struct ufs_sb *s, uint32_t cgx);
+int  ufs1_cg_init (struct ufs1_cg *o, struct ufs_sb *s, uint32_t cgx);
 void ufs1_cg_fini (struct ufs1_cg *o);
 
 static inline uint8_t *ufs1_cg_imap (const struct ufs1_cg *o)

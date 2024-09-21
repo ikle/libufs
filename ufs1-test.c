@@ -202,7 +202,7 @@ static int ufs_cg_show (const struct ufs1_cg *o)
 	return ok;
 }
 
-static int ufs_fs_show (const struct ufs_sb *sb)
+static int ufs_fs_show (struct ufs_sb *sb)
 {
 	int ok = 1;
 	uint32_t i;

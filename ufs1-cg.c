@@ -23,7 +23,7 @@ static inline int ufs1_cg_error (struct ufs1_cg *o, const char *reason)
 	return 0;
 }
 
-int ufs1_cg_init (struct ufs1_cg *o, const struct ufs_sb *s, uint32_t cgx)
+int ufs1_cg_init (struct ufs1_cg *o, struct ufs_sb *s, uint32_t cgx)
 {
 	const off_t pos = (off_t) ufs_cg_cblkno (o->sb = s, cgx) << s->s_fshift;
 	struct ufs1_cg_v2 *c;
