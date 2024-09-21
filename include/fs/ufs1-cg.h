@@ -1,7 +1,7 @@
 /*
  * UNIX File System v1 on-disk cylinder group
  *
- * Copyright (c) 2023 Alexei A. Smekalkine <ikle@ikle.ru>
+ * Copyright (c) 2023-2024 Alexei A. Smekalkine <ikle@ikle.ru>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
@@ -9,7 +9,6 @@
 #ifndef SYS_FS_UFS1_CG_H
 #define SYS_FS_UFS1_CG_H  1
 
-#include <stdint.h>
 #include <fs/ufs1-sb.h>
 
 #define UFS1_CG_MAGIC	0x00090255
