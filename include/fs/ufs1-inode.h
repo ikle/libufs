@@ -1,5 +1,5 @@
 /*
- * UNIX File System v1 on-disk inode, 128 bytes
+ * UNIX File System v1 On-Disk I-Node, 128 bytes
  *
  * Copyright (c) 2023-2024 Alexei A. Smekalkine <ikle@ikle.ru>
  *
