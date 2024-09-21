@@ -8,7 +8,8 @@
 
 #include <sys/param.h>
 
-#include "dev-block.h"
+#include <marten/device/block.h>
+
 #include "ufs-cg.h"
 
 void ufs_cg_fini (struct ufs_cg *o)

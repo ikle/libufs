@@ -16,8 +16,8 @@
 
 #include <fs/ufs1-dirent.h>
 #include <fs/ufs1-inode.h>
+#include <marten/device/block.h>
 
-#include "dev-block.h"
 #include "ufs-cg.h"
 
 static void *

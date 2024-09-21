@@ -40,7 +40,7 @@ static inline uint32_t ufs_cg_ino (const struct ufs_cg *o, uint32_t i)
 }
 
 #include <fs/ufs1-inode.h>
-#include "dev-block.h"
+#include <marten/device/block.h>
 
 static inline
 struct ufs1_inode *ufs1_cg_inode_get (const struct ufs_cg *c, int n, int pull)

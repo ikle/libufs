@@ -1,5 +1,5 @@
 /*
- * Device Block Simplified API
+ * Marten Device Block
  *
  * Copyright (c) 2023-2024 Alexei A. Smekalkine <ikle@ikle.ru>
  *
@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "dev-block.h"
+#include <marten/device/block.h>
 
 void *dev_block_get (int dev, off_t offset, size_t count, int pull)
 {
