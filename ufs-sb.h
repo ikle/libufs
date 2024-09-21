@@ -90,6 +90,11 @@ static inline int32_t ufs_cg_start (const struct ufs_sb *o, uint32_t cgx)
 	return o->fpg * cgx + o->cgoffset * (cgx & ~o->cgmask);
 }
 
+static inline int32_t ufs_cg_sblkno (const struct ufs_sb *o, uint32_t cgx)
+{
+	return ufs_cg_start (o, cgx) + o->sblkno;
+}
+
 static inline int32_t ufs_cg_cblkno (const struct ufs_sb *o, uint32_t cgx)
 {
 	return ufs_cg_start (o, cgx) + o->cblkno;
