@@ -15,11 +15,11 @@
 
 struct ufs_sb {
 	int		dev;
-	uint32_t	s_sblkno, s_cblkno, s_iblkno, s_dblkno;
-	int32_t		s_cgoffset, s_cgmask;
-	uint32_t	s_ncg, s_bshift, s_fshift, s_inopb;
-	uint32_t	s_cgsize, s_ipg, s_fpg;
-	struct ufs1_cs	s_stat;
+	uint32_t	sblkno, cblkno, iblkno, dblkno;
+	int32_t		cgoffset, cgmask;
+	uint32_t	ncg, bshift, fshift, inopb;
+	uint32_t	cgsize, ipg, fpg;
+	struct ufs1_cs	stat;
 };
 
 static inline void ufs_sb_fini (struct ufs_sb *o)
@@ -43,63 +43,63 @@ static inline int ufs_sb_init (struct ufs_sb *o, int dev)
 	if (s->s_magic != UFS1_SB_MAGIC)
 		return ufs_sb_error (o, "Cannot find valid super block magic");
 
-	o->s_sblkno   = s->s_sblkno;
-	o->s_cblkno   = s->s_cblkno;
-	o->s_iblkno   = s->s_iblkno;
-	o->s_dblkno   = s->s_dblkno;
-	o->s_cgsize   = s->s_cgsize;
-	o->s_cgoffset = s->s_cgoffset;
-	o->s_cgmask   = s->s_cgmask;
-	o->s_ncg      = s->s_ncg;
-	o->s_ipg      = s->s_ipg;
-	o->s_fpg      = s->s_fpg;
+	o->sblkno   = s->s_sblkno;
+	o->cblkno   = s->s_cblkno;
+	o->iblkno   = s->s_iblkno;
+	o->dblkno   = s->s_dblkno;
+	o->cgsize   = s->s_cgsize;
+	o->cgoffset = s->s_cgoffset;
+	o->cgmask   = s->s_cgmask;
+	o->ncg      = s->s_ncg;
+	o->ipg      = s->s_ipg;
+	o->fpg      = s->s_fpg;
 
-	if (o->s_sblkno >= o->s_cblkno || o->s_cblkno >= o->s_iblkno ||
-	    o->s_iblkno >= o->s_dblkno || o->s_dblkno >= o->s_fpg ||
-	    o->s_cgsize < sizeof (struct ufs1_cg_v2) ||
-	    o->s_cgsize > (o->s_iblkno - o->s_cblkno) << s->s_fshift)
+	if (o->sblkno >= o->cblkno || o->cblkno >= o->iblkno ||
+	    o->iblkno >= o->dblkno || o->dblkno >= o->fpg ||
+	    o->cgsize < sizeof (struct ufs1_cg_v2) ||
+	    o->cgsize > (o->iblkno - o->cblkno) << s->s_fshift)
 		return ufs_sb_error (o, "Invalid file system layout");
 
-	o->s_bshift = s->s_bshift;
-	o->s_fshift = s->s_fshift;
-	o->s_inopb  = s->s_inopb;
+	o->bshift = s->s_bshift;
+	o->fshift = s->s_fshift;
+	o->inopb  = s->s_inopb;
 
-	if (s->s_bshift < 12 || s->s_bsize != (1L << o->s_bshift) ||
-	    s->s_fshift < 9  || s->s_fsize != (1L << o->s_fshift) ||
-	    s->s_fragshift != (o->s_bshift - o->s_fshift) ||
+	if (s->s_bshift < 12 || s->s_bsize != (1L << o->bshift) ||
+	    s->s_fshift < 9  || s->s_fsize != (1L << o->fshift) ||
+	    s->s_fragshift != (o->bshift - o->fshift) ||
 	    s->s_fragshift < 0 || s->s_fragshift > 3 ||
-	    s->s_fsbtodb != (o->s_fshift - 9) ||
-	    s->s_frag != (1L << (o->s_bshift - o->s_fshift)) ||
-	    s->s_bmask != (~0L << o->s_bshift) ||
-	    s->s_fmask != (~0L << o->s_fshift) ||
-	    o->s_inopb != (s->s_bsize / 128))
+	    s->s_fsbtodb != (o->fshift - 9) ||
+	    s->s_frag != (1L << (o->bshift - o->fshift)) ||
+	    s->s_bmask != (~0L << o->bshift) ||
+	    s->s_fmask != (~0L << o->fshift) ||
+	    o->inopb != (s->s_bsize / 128))
 		return ufs_sb_error (o, "Invalid file system configuration");
 
 	if (s->s_maxembedded != 60 || s->s_inodefmt != 2)
 		return ufs_sb_error (o, "Unknown i-node format");
 
-	o->s_stat = s->s_cstotal;
+	o->stat = s->s_cstotal;
 	return 1;
 }
 
 static inline int32_t ufs_cg_start (const struct ufs_sb *o, uint32_t cgx)
 {
-	return o->s_fpg * cgx + o->s_cgoffset * (cgx & ~o->s_cgmask);
+	return o->fpg * cgx + o->cgoffset * (cgx & ~o->cgmask);
 }
 
 static inline int32_t ufs_cg_cblkno (const struct ufs_sb *o, uint32_t cgx)
 {
-	return ufs_cg_start (o, cgx) + o->s_cblkno;
+	return ufs_cg_start (o, cgx) + o->cblkno;
 }
 
 static inline int32_t ufs_cg_iblkno (const struct ufs_sb *o, uint32_t cgx)
 {
-	return ufs_cg_start (o, cgx) + o->s_iblkno;
+	return ufs_cg_start (o, cgx) + o->iblkno;
 }
 
 static inline int32_t ufs_cg_dblkno (const struct ufs_sb *o, uint32_t cgx)
 {
-	return ufs_cg_start (o, cgx) + o->s_dblkno;
+	return ufs_cg_start (o, cgx) + o->dblkno;
 }
 
 #endif  /* UFS_SB_H */

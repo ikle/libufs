@@ -47,7 +47,7 @@ struct ufs1_inode *ufs1_cg_inode_get (const struct ufs1_cg *c, int n, int pull)
 {
 	const off_t  base = ufs_cg_iblkno (c->sb, c->cgx);
 	const size_t size = sizeof (struct ufs1_inode);
-	const off_t  pos  = (base << c->sb->s_fshift) + n * size;
+	const off_t  pos  = (base << c->sb->fshift) + n * size;
 
 	return dev_block_get (c->sb->dev, pos, size, pull);
 }

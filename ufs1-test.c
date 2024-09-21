@@ -26,8 +26,8 @@ ufs1_inode_dir_pull (const struct ufs1_cg *c, const struct ufs1_inode *o,
 {
 	const uint64_t head  = (frag + 0) * UFS1_DFSIZE;
 	const uint64_t next  = (frag + 1) * UFS1_DFSIZE;
-	const uint32_t block = head >> c->sb->s_bshift;
-	const uint32_t offs  = head & ~(~0 << c->sb->s_bshift);
+	const uint32_t block = head >> c->sb->bshift;
+	const uint32_t offs  = head & ~(~0 << c->sb->bshift);
 	off_t pos;
 
 	if (next > o->i_size)
@@ -36,7 +36,7 @@ ufs1_inode_dir_pull (const struct ufs1_cg *c, const struct ufs1_inode *o,
 	if (block >= ARRAY_SIZE (o->i_db))
 		return NULL;  /* indirect blocks not supported yet */
 
-	pos = ((off_t) o->i_db[block] << c->sb->s_fshift) + offs;
+	pos = ((off_t) o->i_db[block] << c->sb->fshift) + offs;
 
 	return dev_block_get (c->sb->dev, pos, UFS1_DFSIZE, 1);
 }
@@ -97,7 +97,7 @@ static void ufs1_show_mode (unsigned mode, FILE *to)
 static void
 ufs1_inode_show_blocks (const struct ufs1_cg *c, const struct ufs1_inode *o)
 {
-	const uint64_t count  = howmany (o->i_size, 1u << c->sb->s_bshift);
+	const uint64_t count  = howmany (o->i_size, 1u << c->sb->bshift);
 	const size_t count_l1 = MIN (ARRAY_SIZE (o->i_db), count);
 	size_t i;
 
@@ -177,9 +177,9 @@ static void ufs1_show_stat (const struct ufs1_cs *o)
 static void ufs_sb_show (const struct ufs_sb *o)
 {
 	fprintf (stderr, "N: Valid UFS1 super block found\n");
-	fprintf (stderr, "I:     block size  = %d\n", 1 << o->s_bshift);
-	fprintf (stderr, "I:     frag size   = %d\n", 1 << o->s_fshift);
-	ufs1_show_stat (&o->s_stat);
+	fprintf (stderr, "I:     block size  = %d\n", 1 << o->bshift);
+	fprintf (stderr, "I:     frag size   = %d\n", 1 << o->fshift);
+	ufs1_show_stat (&o->stat);
 }
 
 static int ufs_cg_show (const struct ufs1_cg *o)
@@ -210,7 +210,7 @@ static int ufs_fs_show (struct ufs_sb *sb)
 
 	ufs_sb_show (sb);
 
-	for (i = 0; i < sb->s_ncg; ++i) {
+	for (i = 0; i < sb->ncg; ++i) {
 		if (!ufs1_cg_init (&c, sb, i)) {
 			fprintf (stderr, "E: Cannot find valid UFS1 "
 					 "cylinder group %u\n", i);
