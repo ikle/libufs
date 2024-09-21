@@ -28,4 +28,7 @@ static inline void ufs1_inode_put (struct ufs1_inode *o)
 	dev_block_put (o, sizeof (*o));
 }
 
+int32_t ufs1_inode_block (const struct ufs1_sb *sb, const struct ufs1_inode *o,
+			  uint64_t i);
+
 #endif  /* UFS1_INODE_H */
