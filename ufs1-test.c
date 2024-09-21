@@ -17,32 +17,12 @@
 #include <fs/ufs1-dirent.h>
 #include <fs/ufs1-inode.h>
 
+#include "dev-block.h"
 #include "ufs-cg.h"
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a)	(sizeof (a) / sizeof ((a)[0]))
 #endif
-
-static void *dev_block_get (int dev, off_t offset, size_t count, int pull)
-{
-	void *o;
-
-	if ((o = malloc (count)) == NULL)
-		return o;
-
-	if (pull && pread (dev, o, count, offset) != count)
-		goto no_read;
-
-	return o;
-no_read:
-	free (o);
-	return NULL;
-}
-
-static void dev_block_put (void *o, size_t count)
-{
-	free (o);
-}
 
 static void *
 ufs1_inode_dir_pull (const struct ufs_cg *c, const struct ufs1_inode *o,
