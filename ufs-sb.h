@@ -22,18 +22,18 @@ struct ufs_sb {
 	struct ufs1_cs	s_stat;
 };
 
-static void ufs_sb_fini (struct ufs_sb *o)
+static inline void ufs_sb_fini (struct ufs_sb *o)
 {
 	close (o->fd);
 }
 
-static int ufs_sb_error (struct ufs_sb *o, const char *reason)
+static inline int ufs_sb_error (struct ufs_sb *o, const char *reason)
 {
 	ufs_sb_fini (o);
 	return 0;
 }
 
-static int ufs_sb_init (struct ufs_sb *o, int fd)
+static inline int ufs_sb_init (struct ufs_sb *o, int fd)
 {
 	struct ufs1_sb buf, *s = &buf;
 
