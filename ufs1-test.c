@@ -186,12 +186,12 @@ static int ufs_cg_show (const struct ufs1_cg *o)
 {
 	int ok = 1, i;
 
-	fprintf (stderr, "N: Valid UFS1 cylinder group %u found\n", o->cg_cgx);
-	ufs1_show_stat (&o->cg_stat);
+	fprintf (stderr, "N: Valid UFS1 cylinder group %u found\n", o->cgx);
+	ufs1_show_stat (&o->stat);
 
 	fprintf (stderr, "I: List of i-nodes:\n");
 
-	for (i = 0; i < o->cg_ipg; ++i)
+	for (i = 0; i < o->ipg; ++i)
 		if (!ufs1_cg_inode_show (o, i)) {
 			fprintf (stderr, "E: Cannot read inode %u\n",
 				 ufs1_cg_ino (o, i));

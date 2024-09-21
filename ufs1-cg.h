@@ -14,11 +14,11 @@
 struct ufs1_cg {
 	const struct ufs_sb *sb;
 
-	void		*cg_data;
-	int32_t		cg_start;
-	uint32_t	cg_cgx, cg_ipg, cg_fpg;
-	uint32_t	cg_imap_pos, cg_fmap_pos, cg_emap_pos;
-	struct ufs1_cs	cg_stat;
+	void		*data;
+	int32_t		start;
+	uint32_t	cgx, ipg, fpg;
+	uint32_t	imap_pos, fmap_pos, emap_pos;
+	struct ufs1_cs	stat;
 };
 
 int  ufs1_cg_init (struct ufs1_cg *o, const struct ufs_sb *s, uint32_t cgx);
@@ -26,17 +26,17 @@ void ufs1_cg_fini (struct ufs1_cg *o);
 
 static inline uint8_t *ufs1_cg_imap (const struct ufs1_cg *o)
 {
-	return o->cg_data + o->cg_imap_pos;	/* [(cg_ipg + 7) / 8] */
+	return o->data + o->imap_pos;		/* [(ipg + 7) / 8] */
 }
 
 static inline uint8_t *ufs1_cg_fmap (const struct ufs1_cg *o)
 {
-	return o->cg_data + o->cg_fmap_pos;	/* [(cg_fpg + 7) / 8] */
+	return o->data + o->fmap_pos;		/* [(fpg + 7) / 8] */
 }
 
 static inline uint32_t ufs1_cg_ino (const struct ufs1_cg *o, uint32_t i)
 {
-	return o->cg_ipg * o->cg_cgx + i;
+	return o->ipg * o->cgx + i;
 }
 
 #include <fs/ufs1-inode.h>
@@ -45,7 +45,7 @@ static inline uint32_t ufs1_cg_ino (const struct ufs1_cg *o, uint32_t i)
 static inline
 struct ufs1_inode *ufs1_cg_inode_get (const struct ufs1_cg *c, int n, int pull)
 {
-	const off_t  base = ufs_cg_iblkno (c->sb, c->cg_cgx);
+	const off_t  base = ufs_cg_iblkno (c->sb, c->cgx);
 	const size_t size = sizeof (struct ufs1_inode);
 	const off_t  pos  = (base << c->sb->s_fshift) + n * size;
 

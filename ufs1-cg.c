@@ -14,7 +14,7 @@
 
 void ufs1_cg_fini (struct ufs1_cg *o)
 {
-	dev_block_put (o->cg_data, o->sb->s_cgsize);
+	dev_block_put (o->data, o->sb->s_cgsize);
 }
 
 static inline int ufs1_cg_error (struct ufs1_cg *o, const char *reason)
@@ -28,30 +28,30 @@ int ufs1_cg_init (struct ufs1_cg *o, const struct ufs_sb *s, uint32_t cgx)
 	const off_t pos = (off_t) ufs_cg_cblkno (o->sb = s, cgx) << s->s_fshift;
 	struct ufs1_cg_v2 *c;
 
-	if ((o->cg_data = dev_block_get (s->dev, pos, s->s_cgsize, 1)) == NULL)
+	if ((c = o->data = dev_block_get (s->dev, pos, s->s_cgsize, 1)) == NULL)
 		return 0;
 
-	if ((c = o->cg_data)->cg_magic != UFS1_CG_MAGIC)
+	if (c->cg_magic != UFS1_CG_MAGIC)
 		return ufs1_cg_error (o, "Cannot find valid cylinder group magic");
 
-	o->cg_start = ufs_cg_start (s, cgx);
-	o->cg_cgx   = c->cg_cgx;
-	o->cg_ipg   = c->cg_ipg;
-	o->cg_fpg   = c->cg_fpg;
+	o->start = ufs_cg_start (s, cgx);
+	o->cgx   = c->cg_cgx;
+	o->ipg   = c->cg_ipg;
+	o->fpg   = c->cg_fpg;
 
-	if (o->cg_cgx != cgx || o->cg_ipg != s->s_ipg || o->cg_fpg > s->s_fpg)
+	if (o->cgx != cgx || o->ipg != s->s_ipg || o->fpg > s->s_fpg)
 		return ufs1_cg_error (o, "Invalid cylinder group configuration");
 
-	o->cg_imap_pos = c->cg_iusedoff;
-	o->cg_fmap_pos = c->cg_freeoff;
-	o->cg_emap_pos = c->cg_nextfreeoff;
+	o->imap_pos = c->cg_iusedoff;
+	o->fmap_pos = c->cg_freeoff;
+	o->emap_pos = c->cg_nextfreeoff;
 
-	if (o->cg_emap_pos > s->s_cgsize || o->cg_fmap_pos >= o->cg_emap_pos ||
-	    o->cg_imap_pos >= o->cg_fmap_pos ||
-	    (o->cg_fmap_pos - o->cg_imap_pos) < howmany (o->cg_ipg, 8) ||
-	    (o->cg_emap_pos - o->cg_fmap_pos) < howmany (o->cg_fpg, 8))
+	if (o->emap_pos > s->s_cgsize || o->fmap_pos >= o->emap_pos ||
+	    o->imap_pos >= o->fmap_pos ||
+	    (o->fmap_pos - o->imap_pos) < howmany (o->ipg, 8) ||
+	    (o->emap_pos - o->fmap_pos) < howmany (o->fpg, 8))
 		return ufs1_cg_error (o, "Invalid cylinder group layout");
 
-	o->cg_stat = c->cg_cs;
+	o->stat = c->cg_cs;
 	return 1;
 }
