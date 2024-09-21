@@ -1,5 +1,5 @@
 /*
- * UNIX File System v1 on-disk directory entry
+ * UNIX File System v1 On-Disk Directory Entry
  *
  * Copyright (c) 2023-2024 Alexei A. Smekalkine <ikle@ikle.ru>
  *
