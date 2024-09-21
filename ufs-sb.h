@@ -82,6 +82,9 @@ static inline int ufs_sb_init (struct ufs_sb *o, int dev)
 	return 1;
 }
 
+/*
+ * Next set of functions returns fragment number
+ */
 static inline int32_t ufs_cg_start (const struct ufs_sb *o, uint32_t cgx)
 {
 	return o->fpg * cgx + o->cgoffset * (cgx & ~o->cgmask);
