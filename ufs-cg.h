@@ -36,7 +36,7 @@ static inline uint8_t *ufs_cg_fmap (const struct ufs_cg *o)
 
 static inline uint32_t ufs_cg_ino (const struct ufs_cg *o, uint32_t i)
 {
-	return o->sb->s_ipg * o->cg_cgx + i;
+	return o->cg_ipg * o->cg_cgx + i;
 }
 
 #include <unistd.h>
