@@ -53,7 +53,7 @@ static inline int32_t *ufs1_cg_v2_btot (struct ufs1_cg_v2 *o)
 }
 
 static inline
-int16_t *ufs1_cg_b (const struct ufs1_sb *s, struct ufs1_cg_v2 *o, int cylno)
+int16_t *ufs1_cg_b (const struct ufs1_sb_v2 *s, struct ufs1_cg_v2 *o, int cylno)
 {
 	return (int16_t *) ((void *) o + o->cg_boff) + s->s_nrpos * cylno;  /* [s_cpg * s_nrpos] */
 }

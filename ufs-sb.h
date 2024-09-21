@@ -35,7 +35,7 @@ static inline int ufs_sb_error (struct ufs_sb *o, const char *reason)
 
 static inline int ufs_sb_init (struct ufs_sb *o, int dev)
 {
-	struct ufs1_sb buf, *s = &buf;
+	struct ufs1_sb_v2 buf, *s = &buf;
 
 	if (pread (o->dev = dev, &buf, sizeof (buf), 8192) != sizeof (buf))
 		return ufs_sb_error (o, "Cannot read super block");

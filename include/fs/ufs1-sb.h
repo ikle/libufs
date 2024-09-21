@@ -31,7 +31,7 @@
  * 5. (i) -- config: filesystem identification.
  * 6. (s) -- filesystem state: timestamp or statistics.
  */
-struct ufs1_sb {
+struct ufs1_sb_v2 {
 	int32_t		s_link;		/* (-) linked list of FSs	*/
 	int32_t		s_rlink;	/* (-) linked list of SBs	*/
 	int32_t		s_sblkno;	/* first SB fragment in CG	*/
@@ -110,38 +110,5 @@ struct ufs1_sb {
 	int32_t		s_magic;
 /* 0x560 */
 };
-
-/*
- * Next set of functions returns fragment number
- */
-static inline int32_t ufs1_cg_base (const struct ufs1_sb *s, uint32_t cgx)
-{
-	return s->s_fpg * cgx;
-}
-
-static inline int32_t ufs1_cg_start (const struct ufs1_sb *s, uint32_t cgx)
-{
-	return ufs1_cg_base (s, cgx) + s->s_cgoffset * (cgx & ~s->s_cgmask);
-}
-
-static inline int32_t ufs1_cg_sblkno (const struct ufs1_sb *s, uint32_t cgx)
-{
-	return ufs1_cg_start (s, cgx) + s->s_sblkno;
-}
-
-static inline int32_t ufs1_cg_cblkno (const struct ufs1_sb *s, uint32_t cgx)
-{
-	return ufs1_cg_start (s, cgx) + s->s_cblkno;
-}
-
-static inline int32_t ufs1_cg_iblkno (const struct ufs1_sb *s, uint32_t cgx)
-{
-	return ufs1_cg_start (s, cgx) + s->s_iblkno;
-}
-
-static inline int32_t ufs1_cg_dblkno (const struct ufs1_sb *s, uint32_t cgx)
-{
-	return ufs1_cg_start (s, cgx) + s->s_dblkno;
-}
 
 #endif  /* SYS_FS_UFS1_SB_H */
