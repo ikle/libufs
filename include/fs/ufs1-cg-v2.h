@@ -1,21 +1,19 @@
 /*
- * UNIX File System v1 On-Disk Cylinder Group
+ * UFS1 On-Disk Cylinder Group, Format Version 2
  *
  * Copyright (c) 2023-2024 Alexei A. Smekalkine <ikle@ikle.ru>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-#ifndef SYS_FS_UFS1_CG_H
-#define SYS_FS_UFS1_CG_H  1
+#ifndef FS_UFS1_CG_V2_H
+#define FS_UFS1_CG_V2_H  1
 
 #include <fs/ufs1-sb-v2.h>
 
 #define UFS1_CG_MAGIC	0x00090255
 
 /*
- * On-disk CG format version 2
- *
  * 1. Introduced in BSD 4.3-Tahoe.
  * 2. Magic field position moved.
  * 3. Added support for more than 32 cylinders per CG.
@@ -78,4 +76,4 @@ static inline uint8_t *ufs1_cg_v2_cmap (struct ufs1_cg_v2 *o)
 	return (void *) o + o->cg_clusteroff;	/* [cg_nclusterblks] */
 }
 
-#endif  /* SYS_FS_UFS1_CG_H */
+#endif  /* FS_UFS1_CG_V2_H */

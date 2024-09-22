@@ -8,7 +8,7 @@
 
 #include <unistd.h>
 
-#include <fs/ufs1-cg.h>
+#include <fs/ufs1-cg-v2.h>
 #include <fs/ufs1-sb.h>
 
 void ufs1_sb_fini (struct ufs1_sb *o)
