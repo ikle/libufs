@@ -14,11 +14,12 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <fs/ufs1-cg.h>
 #include <fs/ufs1-dirent.h>
 #include <fs/ufs1-inode.h>
 #include <marten/device/block.h>
 
-#include "ufs1-cg.h"
+#include "ufs1-inode.h"
 
 static void *
 ufs1_inode_dir_pull (const struct ufs1_cg *c, const struct ufs1_inode *o,
@@ -162,7 +163,7 @@ static int ufs1_cg_inode_show (const struct ufs1_cg *c, int n)
 		 o->i_nlink, o->i_uid, o->i_gid,
 		 (unsigned long long) o->i_size, o->i_blocks);
 	ufs1_inode_show_data (c, o);
-	ufs1_cg_inode_put (o);
+	ufs1_inode_put (o);
 	return 1;
 }
 

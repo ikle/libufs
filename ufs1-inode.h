@@ -1,16 +1,15 @@
 /*
- * UFS1 Cylinder Group
+ * UFS1 Index Node
  *
  * Copyright (c) 2023-2024 Alexei A. Smekalkine <ikle@ikle.ru>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-#ifndef UFS1_CG_H
-#define UFS1_CG_H  1
+#ifndef UFS1_INODE_H
+#define UFS1_INODE_H  1
 
 #include <fs/ufs1-cg.h>
-
 #include <fs/ufs1-inode.h>
 #include <marten/device/block.h>
 
@@ -24,9 +23,9 @@ struct ufs1_inode *ufs1_cg_inode_get (const struct ufs1_cg *c, int n, int pull)
 	return dev_block_get (c->sb->dev, pos, size, pull);
 }
 
-static inline void ufs1_cg_inode_put (struct ufs1_inode *o)
+static inline void ufs1_inode_put (struct ufs1_inode *o)
 {
 	dev_block_put (o, sizeof (*o));
 }
 
-#endif  /* UFS1_CG_H */
+#endif  /* UFS1_INODE_H */
