@@ -9,10 +9,10 @@
 #ifndef UFS1_CG_H
 #define UFS1_CG_H  1
 
-#include "ufs-sb.h"
+#include "ufs1-sb.h"
 
 struct ufs1_cg {
-	struct ufs_sb *sb;
+	struct ufs1_sb *sb;
 
 	void		*data;
 	int32_t		start;
@@ -21,7 +21,7 @@ struct ufs1_cg {
 	struct ufs1_cs	stat;
 };
 
-int  ufs1_cg_init (struct ufs1_cg *o, struct ufs_sb *s, uint32_t cgx);
+int  ufs1_cg_init (struct ufs1_cg *o, struct ufs1_sb *s, uint32_t cgx);
 void ufs1_cg_fini (struct ufs1_cg *o);
 
 static inline uint8_t *ufs1_cg_imap (const struct ufs1_cg *o)
@@ -45,7 +45,7 @@ static inline uint32_t ufs1_cg_ino (const struct ufs1_cg *o, uint32_t i)
 static inline
 struct ufs1_inode *ufs1_cg_inode_get (const struct ufs1_cg *c, int n, int pull)
 {
-	const off_t  base = ufs_cg_iblkno (c->sb, c->cgx);
+	const off_t  base = ufs1_cg_iblkno (c->sb, c->cgx);
 	const size_t size = sizeof (struct ufs1_inode);
 	const off_t  pos  = (base << c->sb->fshift) + n * size;
 

@@ -174,7 +174,7 @@ static void ufs1_show_stat (const struct ufs1_cs *o)
 	fprintf (stderr, "I:     free frags  = %d\n", o->cs_nffree);
 }
 
-static void ufs_sb_show (const struct ufs_sb *o)
+static void ufs1_sb_show (const struct ufs1_sb *o)
 {
 	fprintf (stderr, "N: Valid UFS1 super block found\n");
 	fprintf (stderr, "I:     block size  = %d\n", 1 << o->bshift);
@@ -202,13 +202,13 @@ static int ufs_cg_show (const struct ufs1_cg *o)
 	return ok;
 }
 
-static int ufs_fs_show (struct ufs_sb *sb)
+static int ufs1_fs_show (struct ufs1_sb *sb)
 {
 	int ok = 1;
 	uint32_t i;
 	struct ufs1_cg c;
 
-	ufs_sb_show (sb);
+	ufs1_sb_show (sb);
 
 	for (i = 0; i < sb->ncg; ++i) {
 		if (!ufs1_cg_init (&c, sb, i)) {
@@ -228,7 +228,7 @@ static int ufs_fs_show (struct ufs_sb *sb)
 int main (int argc, char *argv[])
 {
 	int fd, ok;
-	struct ufs_sb s;
+	struct ufs1_sb s;
 
 	if (argc != 2) {
 		fprintf (stderr, "usage:\n\tufs1-test <ufs1-image>\n");
@@ -240,13 +240,13 @@ int main (int argc, char *argv[])
 		return 1;
 	}
 
-	if (!ufs_sb_init (&s, fd)) {
+	if (!ufs1_sb_init (&s, fd)) {
 		fprintf (stderr, "E: Cannot find valid UFS1 super block\n");
 		return 1;
 	}
 
-	ok = ufs_fs_show (&s);
+	ok = ufs1_fs_show (&s);
 
-	ufs_sb_fini (&s);
+	ufs1_sb_fini (&s);
 	return ok ? 0 : 1;
 }

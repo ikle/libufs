@@ -23,9 +23,9 @@ static inline int ufs1_cg_error (struct ufs1_cg *o, const char *reason)
 	return 0;
 }
 
-int ufs1_cg_init (struct ufs1_cg *o, struct ufs_sb *s, uint32_t cgx)
+int ufs1_cg_init (struct ufs1_cg *o, struct ufs1_sb *s, uint32_t cgx)
 {
-	const off_t pos = (off_t) ufs_cg_cblkno (o->sb = s, cgx) << s->fshift;
+	const off_t pos = (off_t) ufs1_cg_cblkno (o->sb = s, cgx) << s->fshift;
 	struct ufs1_cg_v2 *c;
 
 	if ((c = o->data = dev_block_get (s->dev, pos, s->cgsize, 1)) == NULL)
@@ -34,7 +34,7 @@ int ufs1_cg_init (struct ufs1_cg *o, struct ufs_sb *s, uint32_t cgx)
 	if (c->cg_magic != UFS1_CG_MAGIC)
 		return ufs1_cg_error (o, "Cannot find valid cylinder group magic");
 
-	o->start = ufs_cg_start (s, cgx);
+	o->start = ufs1_cg_start (s, cgx);
 	o->cgx   = c->cg_cgx;
 	o->ipg   = c->cg_ipg;
 	o->fpg   = c->cg_fpg;
