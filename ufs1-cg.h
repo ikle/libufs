@@ -9,7 +9,7 @@
 #ifndef UFS1_CG_H
 #define UFS1_CG_H  1
 
-#include "ufs1-sb.h"
+#include <fs/ufs1-sb.h>
 
 struct ufs1_cg {
 	struct ufs1_sb *sb;

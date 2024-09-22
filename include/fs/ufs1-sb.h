@@ -6,8 +6,8 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-#ifndef UFS1_SB_H
-#define UFS1_SB_H  1
+#ifndef FS_UFS1_SB_H
+#define FS_UFS1_SB_H  1
 
 #include <stdint.h>
 
@@ -53,4 +53,4 @@ static inline int32_t ufs1_cg_dblkno (const struct ufs1_sb *o, uint32_t cgx)
 	return ufs1_cg_start (o, cgx) + o->dblkno;
 }
 
-#endif  /* UFS1_SB_H */
+#endif  /* FS_UFS1_SB_H */
