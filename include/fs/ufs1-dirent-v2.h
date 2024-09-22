@@ -1,13 +1,13 @@
 /*
- * UNIX File System v1 On-Disk Directory Entry
+ * UFS1 On-Disk Directory Entry, Format Version 2
  *
  * Copyright (c) 2023-2024 Alexei A. Smekalkine <ikle@ikle.ru>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-#ifndef SYS_FS_UFS1_DIRENT_H
-#define SYS_FS_UFS1_DIRENT_H  1
+#ifndef FS_UFS1_DIRENT_V2_H
+#define FS_UFS1_DIRENT_v2_H  1
 
 #include <stddef.h>
 #include <stdint.h>
@@ -15,7 +15,7 @@
 #define UFS1_DFSIZE	512	/* directory fragment size */
 
 /*
- * Introduced by 4.4BSD, format version 2
+ * Introduced by 4.4BSD
  */
 struct ufs1_dirent {
 	int32_t		d_ino;		/* dirhash uses negative marks	*/
@@ -62,4 +62,4 @@ static inline struct ufs1_dirent *ufs1_dirent_next (const struct ufs1_dirent *o)
 	return (void *) o + o->d_reclen;
 }
 
-#endif  /* SYS_FS_UFS1_DIRENT_H */
+#endif  /* FS_UFS1_DIRENT_V2_H */
