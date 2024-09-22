@@ -9,6 +9,7 @@
 #include <sys/param.h>
 
 #include <marten/device/block.h>
+#include <fs/ufs1-cg.h>
 
 #include "ufs1-cg.h"
 
