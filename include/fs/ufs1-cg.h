@@ -9,7 +9,7 @@
 #ifndef SYS_FS_UFS1_CG_H
 #define SYS_FS_UFS1_CG_H  1
 
-#include <fs/ufs1-sb.h>
+#include <fs/ufs1-sb-v2.h>
 
 #define UFS1_CG_MAGIC	0x00090255
 

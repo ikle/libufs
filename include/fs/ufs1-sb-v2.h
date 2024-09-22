@@ -1,21 +1,19 @@
 /*
- * UNIX File System v1 On-Disk Super Block
+ * UFS1 On-Disk Super Block, Format Version 2
  *
  * Copyright (c) 2023-2024 Alexei A. Smekalkine <ikle@ikle.ru>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-#ifndef SYS_FS_UFS1_SB_H
-#define SYS_FS_UFS1_SB_H  1
+#ifndef FS_UFS1_SB_V2_H
+#define FS_UFS1_SB_V2_H  1
 
 #include <fs/ufs1-stat.h>
 
 #define UFS1_SB_MAGIC	0x00011954
 
 /*
- * On-disk SB format version 2
- *
  * 1. Introduced in BSD 4.1b.
  * 2. New rotations tables format introduced in 4.3BSD-Tahoe.
  * 3. Quad mask hints added in 4.3BSD-Tahoe.
@@ -111,4 +109,4 @@ struct ufs1_sb_v2 {
 /* 0x560 */
 };
 
-#endif  /* SYS_FS_UFS1_SB_H */
+#endif  /* FS_UFS1_SB_V2_H */
