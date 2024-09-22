@@ -1,13 +1,13 @@
 /*
- * UNIX File System v1 On-Disk I-Node, 128 bytes
+ * UFS1 On-Disk I-Node, Format Version 2, 128 bytes
  *
  * Copyright (c) 2023-2024 Alexei A. Smekalkine <ikle@ikle.ru>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-#ifndef SYS_FS_UFS1_INODE_H
-#define SYS_FS_UFS1_INODE_H  1
+#ifndef FS_UFS1_INODE_V2_H
+#define FS_UFS1_INODE_V2_H  1
 
 #include <stdint.h>
 
@@ -25,8 +25,6 @@ union ufs1_data {
 };
 
 /*
- * On-disk i-node format version 2
- *
  * 1. Introduced in 4.4BSD, used if fs_inodefmt = 2 (FS_44INODEFMT) and
  *    fs_maxsymlinklen = 60 (sizeof (i_content)).
  * 2. Rationale for the fs_maxsymlinklen check: it shares position with
@@ -81,4 +79,4 @@ static inline uint32_t ufs1_makedev (uint32_t major, uint32_t minor)
 	return (major << 8) | (minor & 0xff) | (minor & 0xffff00) << 8;
 }
 
-#endif  /* SYS_FS_UFS1_INODE_H */
+#endif  /* FS_UFS1_INODE_V2_H */

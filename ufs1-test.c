@@ -16,7 +16,7 @@
 
 #include <fs/ufs1-cg.h>
 #include <fs/ufs1-dirent.h>
-#include <fs/ufs1-inode.h>
+#include <fs/ufs1-inode-v2.h>
 #include <marten/device/block.h>
 
 #include "ufs1-inode.h"

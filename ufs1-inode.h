@@ -10,7 +10,7 @@
 #define UFS1_INODE_H  1
 
 #include <fs/ufs1-cg.h>
-#include <fs/ufs1-inode.h>
+#include <fs/ufs1-inode-v2.h>
 #include <marten/device/block.h>
 
 static inline
